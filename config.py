@@ -9,7 +9,8 @@ class Config:
     # Default live Supabase PostgreSQL database connection URL
     DEFAULT_SUPABASE_URI = 'postgresql://postgres.kbulscucdcexqnudfgec:Roshen%402026@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres'
     
-    db_url = os.environ.get('DATABASE_URL') or DEFAULT_SUPABASE_URI
+    raw_url = os.environ.get('DATABASE_URL') or ''
+    db_url = raw_url.strip().replace('\r', '').replace('\n', '') or DEFAULT_SUPABASE_URI
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
