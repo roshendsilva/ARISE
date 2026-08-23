@@ -31,7 +31,10 @@ def load_user(user_id):
 # Context Processor for Site-Wide Data
 @app.context_processor
 def inject_global_data():
-    categories = Category.query.all()
+    try:
+        categories = Category.query.all()
+    except Exception:
+        categories = []
     return dict(all_categories=categories)
 
 # Automatically create tables & seed database on app startup if running locally
