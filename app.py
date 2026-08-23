@@ -34,10 +34,14 @@ def inject_global_data():
     categories = Category.query.all()
     return dict(all_categories=categories)
 
-# Automatically create tables & seed database on app startup
-with app.app_context():
-    db.create_all()
-    seed_database(app)
+# Automatically create tables & seed database on app startup if running locally
+if not os.environ.get('VERCEL'):
+    with app.app_context():
+        try:
+            db.create_all()
+            seed_database(app)
+        except Exception as e:
+            print(f"Startup DB init notice: {e}")
 
 # ==================== PUBLIC ROUTES ====================
 
