@@ -7,7 +7,12 @@ from models import db, User, Category, Article, ChurchFather, ScriptureReference
 from seed_data import seed_database
 from sqlalchemy import or_
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+    static_folder=os.path.join(BASE_DIR, 'static')
+)
 app.config.from_object(Config)
 
 @app.template_filter('render_md')
