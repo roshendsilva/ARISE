@@ -4,10 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'arise-catholic-apologetics-default-secret-key')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'arise-catholic-apologetics-secret-key-2026-god-is-truth')
     
-    # Handle database URL for SQLite or Supabase/Postgres
-    db_url = os.environ.get('DATABASE_URL', 'sqlite:///arise.db')
+    # Default live Supabase PostgreSQL database connection URL
+    DEFAULT_SUPABASE_URI = 'postgresql://postgres.kbulscucdcexqnudfgec:Roshen%402026@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres'
+    
+    db_url = os.environ.get('DATABASE_URL') or DEFAULT_SUPABASE_URI
     if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
