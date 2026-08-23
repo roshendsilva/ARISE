@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}{% if article %}Edit Article: {{ article.title }}{% else %}Create New Article{% endif %} - ARISE Admin{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">{% if article %}Edit Defense Article{% else %}Create New Defense Article{% endif %}</h1>
+    <p class="text-muted mb-0">Fill in the 8-section scholarly apologetic defense framework</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+      <form action="{% if article %}{{ url_for('admin_article_edit', id=article.id) }}{% else %}{{ url_for('admin_article_new') }}{% endif %}" method="POST">
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-8">
+            <label for="title" class="form-label fw-bold">Article Title *</label>
+            <input type="text" class="form-control form-control-lg" id="title" name="title" value="{{ article.title if article else '' }}" required placeholder="e.g. Does the Bible Teach Sola Scriptura?">
+          </div>
+          <div class="col-md-4">
+            <label for="category_id" class="form-label fw-bold">Category *</label>
+            <select class="form-select form-select-lg" id="category_id" name="category_id" required>
+              {% for cat in categories %}
+              <option value="{{ cat.id }}" {% if article and article.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="slug" class="form-label fw-bold">URL Slug</label>
+            <input type="text" class="form-control" id="slug" name="slug" value="{{ article.slug if article else '' }}" placeholder="Auto-generated if left blank">
+          </div>
+          <div class="col-md-3">
+            <label for="status" class="form-label fw-bold">Publishing Status</label>
+            <select class="form-select" id="status" name="status">
+              <option value="Published" {% if not article or article.status == 'Published' %}selected{% endif %}>Published</option>
+              <option value="Draft" {% if article and article.status == 'Draft' %}selected{% endif %}>Draft</option>
+              <option value="Archived" {% if article and article.status == 'Archived' %}selected{% endif %}>Archived</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" {% if article and article.is_featured %}checked{% endif %}>
+              <label class="form-check-label fw-bold" for="is_featured">Feature on Homepage</label>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- 8-Section Layout Fields -->
+        <h4 class="h5 brand-font text-warning mb-3">1. The Question & Common Views</h4>
+        <div class="mb-3">
+          <label for="question" class="form-label fw-semibold">1. Theological Question *</label>
+          <textarea class="form-control" id="question" name="question" rows="2" required>{{ article.question if article else '' }}</textarea>
+        </div>
+        <div class="mb-4">
+          <label for="what_protestants_believe" class="form-label fw-semibold">2. Common Objections & External Perspectives</label>
+          <textarea class="form-control" id="what_protestants_believe" name="what_protestants_believe" rows="2">{{ article.what_protestants_believe if article else '' }}</textarea>
+        </div>
+
+        <h4 class="h5 brand-font text-warning mb-3">2. Executive Summary & Teaching</h4>
+        <div class="mb-3">
+          <label for="short_answer" class="form-label fw-semibold">3. Short Answer / Executive Defense *</label>
+          <textarea class="form-control" id="short_answer" name="short_answer" rows="3" required>{{ article.short_answer if article else '' }}</textarea>
+        </div>
+        <div class="mb-4">
+          <label for="catholic_teaching" class="form-label fw-semibold">4. Official Catholic Teaching *</label>
+          <textarea class="form-control" id="catholic_teaching" name="catholic_teaching" rows="3" required>{{ article.catholic_teaching if article else '' }}</textarea>
+        </div>
+
+        <h4 class="h5 brand-font text-warning mb-3">3. Scriptural Proofs & Refutations</h4>
+        <div class="mb-3">
+          <label for="biblical_evidence" class="form-label fw-semibold">5. Scriptural Proof-Texts & Biblical Evidence (HTML/Markdown)</label>
+          <textarea class="form-control" id="biblical_evidence" name="biblical_evidence" rows="5">{{ article.biblical_evidence if article else '' }}</textarea>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label for="objection" class="form-label fw-semibold">Common Objection Text</label>
+            <textarea class="form-control" id="objection" name="objection" rows="3">{{ article.objection if article else '' }}</textarea>
+          </div>
+          <div class="col-md-6">
+            <label for="catholic_response" class="form-label fw-semibold">6. Catholic Refutation Response</label>
+            <textarea class="form-control" id="catholic_response" name="catholic_response" rows="3">{{ article.catholic_response if article else '' }}</textarea>
+          </div>
+        </div>
+
+        <h4 class="h5 brand-font text-warning mb-3">4. Historical & Patristic Evidence</h4>
+        <div class="mb-3">
+          <label for="early_church_evidence" class="form-label fw-semibold">7. Witness of the Early Church Fathers</label>
+          <textarea class="form-control" id="early_church_evidence" name="early_church_evidence" rows="4">{{ article.early_church_evidence if article else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="catechism_text" class="form-label fw-semibold">8. Catechism of the Catholic Church (CCC) Paragraphs</label>
+          <textarea class="form-control" id="catechism_text" name="catechism_text" rows="3">{{ article.catechism_text if article else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="historical_documents" class="form-label fw-semibold">Historical / Council Documents</label>
+          <textarea class="form-control" id="historical_documents" name="historical_documents" rows="2">{{ article.historical_documents if article else '' }}</textarea>
+        </div>
+        <div class="mb-4">
+          <label for="conclusion" class="form-label fw-semibold">Theological Conclusion</label>
+          <textarea class="form-control" id="conclusion" name="conclusion" rows="2">{{ article.conclusion if article else '' }}</textarea>
+        </div>
+
+        <div class="d-flex justify-content-between pt-3 border-top">
+          <a href="{{ url_for('admin_articles') }}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-gold btn-lg"><i class="bi bi-check-lg me-1"></i> Save Article</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

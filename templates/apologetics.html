@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Apologetics Knowledge Base - ARISE{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">Apologetics Library</h1>
+    <p class="text-muted mb-0">Browse complete Catholic theological defenses categorized by topic</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Search & Category Filters -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form action="{{ url_for('apologetics') }}" method="GET" class="row g-3 align-items-center">
+        <div class="col-md-7">
+          <div class="input-group">
+            <span class="input-group-text bg-body text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search defense articles...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select name="category" class="form-select" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for cat in all_categories %}
+            <option value="{{ cat.slug }}" {% if selected_category and selected_category.slug == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-gold w-100">Filter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Category Nav Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{{ url_for('apologetics') }}" class="btn btn-sm {% if not selected_category %}btn-gold{% else %}btn-outline-secondary{% endif %}">All Topics</a>
+    {% for cat in all_categories %}
+    <a href="{{ url_for('apologetics', category=cat.slug) }}" class="btn btn-sm {% if selected_category and selected_category.slug == cat.slug %}btn-gold{% else %}btn-outline-secondary{% endif %}">
+      <i class="bi {{ cat.icon }} me-1"></i> {{ cat.name }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Topic "About" Overview Banner -->
+  {% if selected_category and selected_category.overview %}
+  <div class="scholarly-box mb-4 border-start border-4 border-warning shadow-sm animate-fade-in">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <i class="bi {{ selected_category.icon }} fs-3 text-warning"></i>
+      <h2 class="h4 brand-font text-warning mb-0">About {{ selected_category.name }}</h2>
+    </div>
+    <hr class="my-2 border-secondary-subtle">
+    <div class="lh-lg mt-3">
+      {{ selected_category.overview | render_md | safe }}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Articles Grid Header -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="h5 brand-font text-heading mb-0">
+      {% if selected_category %}
+      Defenses under <span class="text-gold">{{ selected_category.name }}</span>
+      {% else %}
+      All Apologetic Defense Topics
+      {% endif %}
+    </h3>
+    <span class="small text-muted">{{ articles|length }} articles available</span>
+  </div>
+
+  {% if articles %}
+  <div class="row g-4">
+    {% for article in articles %}
+    <div class="col-md-6 col-lg-4">
+      <div class="article-card">
+        <div class="article-card-header">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge badge-category">{{ article.category.name }}</span>
+            {% if article.is_featured %}<span class="badge badge-gold"><i class="bi bi-star-fill me-1"></i> Featured</span>{% endif %}
+          </div>
+          <h2 class="h5 brand-font"><a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-reset">{{ article.title }}</a></h2>
+        </div>
+        <div class="article-card-body">
+          <p class="small text-muted mb-0">{{ article.short_answer[:130] }}...</p>
+        </div>
+        <div class="article-card-footer d-flex justify-content-between align-items-center">
+          <span class="small text-muted"><i class="bi bi-journal-text me-1"></i> 8-Section Defense</span>
+          <a href="{{ url_for('article_detail', slug=article.slug) }}" class="btn btn-gold btn-sm">Read Article &rarr;</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-search fs-1 text-muted d-block mb-3"></i>
+    <h3 class="h5 brand-font text-muted">No defense articles found</h3>
+    <p class="small text-muted">Try adjusting your search criteria or clearing topic filters.</p>
+    <a href="{{ url_for('apologetics') }}" class="btn btn-outline-gold btn-sm">Reset Filters</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

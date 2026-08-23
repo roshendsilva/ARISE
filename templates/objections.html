@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Objection Explorer - ARISE Catholic Apologetics{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">Catholic Objection Explorer</h1>
+    <p class="text-muted mb-0">Concise, scripture-backed responses to common non-Catholic, secular, and theological challenges</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Search Bar -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form action="{{ url_for('objections') }}" method="GET" class="row g-3">
+        <div class="col-md-9">
+          <div class="input-group">
+            <span class="input-group-text bg-body text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search objections (e.g. Mary worship, Statues, Confession, Faith Alone)...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-gold w-100"><i class="bi bi-search me-1"></i> Search Objections</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Objections List -->
+  {% if objections %}
+  <div class="row g-4">
+    {% for obj in objections %}
+    <div class="col-md-6">
+      <div class="scholarly-box h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex align-items-start gap-2 mb-2">
+            <i class="bi bi-question-circle-fill text-warning fs-4"></i>
+            <h2 class="h5 brand-font text-heading mb-0">"{{ obj.objection_text }}"</h2>
+          </div>
+          <hr class="my-2 border-secondary">
+          
+          <p class="mb-3"><strong>Catholic Response:</strong> {{ obj.short_rebuttal | render_md | safe }}</p>
+
+          {% if obj.worship_vs_veneration_note %}
+          <div class="alert alert-warning py-2 px-3 small border-0 mb-3">
+            <i class="bi bi-info-circle me-1"></i> <strong>Theological Note:</strong> {{ obj.worship_vs_veneration_note | render_md | safe }}
+          </div>
+          {% endif %}
+
+        </div>
+
+        {% if obj.article %}
+        <div class="pt-2 border-top text-end">
+          <a href="{{ url_for('article_detail', slug=obj.article.slug) }}" class="btn btn-outline-gold btn-sm">
+            Read Full Defense: {{ obj.article.title }} &rarr;
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-patch-question fs-1 text-muted d-block mb-3"></i>
+    <h3 class="h5 brand-font text-muted">No objections match your search</h3>
+    <a href="{{ url_for('objections') }}" class="btn btn-outline-gold btn-sm mt-2">View All Objections</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

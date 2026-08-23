@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}About ARISE - Methodology & Mission{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">About ARISE</h1>
+    <p class="text-muted mb-0">Apologetics for the Reasoned Interpretation of Scripture & Explanation</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <div class="row g-5">
+    <div class="col-lg-8">
+      <div class="scholarly-box mb-4">
+        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-compass-fill me-2"></i> Our Mission & Vision</h2>
+        <p><strong>ARISE</strong> was founded to provide Christians, seekers, and scholars with an uncompromised, authentic, and scholarly Catholic apologetics repository.</p>
+        <p>In an age dominated by soundbites and misrepresentations, ARISE elevates apologetics back to its historic dignity: combining biblical exegesis, patristic archaeology, and magisterial documents to defend the beauty and truth of the Catholic Faith.</p>
+      </div>
+
+      <div class="scholarly-box mb-4">
+        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-shield-check me-2"></i> Content Integrity Standard</h2>
+        <p>Every article on ARISE adheres to strict scholarly guidelines:</p>
+        <ul>
+          <li><strong>No Fabricated Sources:</strong> All citations from Scripture, Church Fathers, and Councils are verified against historical manuscripts and published translations.</li>
+          <li><strong>Respectful Ecumenical & Philosophical Tone:</strong> We present all non-Catholic, Orthodox, secular, and inquirer positions fairly without caricature, answering objections with charitable clarity.</li>
+          <li><strong>Rigorous 8-Part Structure:</strong> Every defense follows a uniform analytical sequence to ensure complete thoroughness.</li>
+        </ul>
+      </div>
+
+      <div class="scholarly-box mb-4">
+        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-book-half me-2"></i> Theological Terminology Glossary</h2>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="border rounded p-3 text-center bg-body-tertiary">
+              <h5 class="h6 brand-font text-gold">Latria</h5>
+              <p class="small text-muted mb-0">Supreme Divine Worship due to Almighty God alone (Father, Son, Holy Spirit).</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 text-center bg-body-tertiary">
+              <h5 class="h6 brand-font text-gold">Dulia</h5>
+              <p class="small text-muted mb-0">Veneration and honor paid to holy angels and human saints.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="border rounded p-3 text-center bg-body-tertiary">
+              <h5 class="h6 brand-font text-gold">Hyperdulia</h5>
+              <p class="small text-muted mb-0">Highest creaturely veneration given uniquely to the Blessed Virgin Mary as Mother of God.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 mb-4 text-center">
+        <div class="card-body">
+          <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ARISE Emblem" class="img-fluid rounded-3 mb-3 p-2 bg-white shadow-sm" style="max-height: 160px;">
+          <h3 class="h5 brand-font text-warning mb-3">Tagline & Motto</h3>
+          <blockquote class="blockquote serif-body text-center py-3 border-top border-bottom">
+            "Seek Truth. Know the Faith. Defend the Faith."
+          </blockquote>
+          <p class="small text-muted text-center">Inspired by 1 Peter 3:15</p>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h3 class="h5 brand-font text-warning mb-3">Core Research Tools</h3>
+          <ul class="list-group list-group-flush small">
+            <li class="list-group-item bg-transparent"><a href="{{ url_for('apologetics') }}" class="text-decoration-none">Apologetics Library</a></li>
+            <li class="list-group-item bg-transparent"><a href="{{ url_for('bible_explorer') }}" class="text-decoration-none">Scripture Proof-Texts</a></li>
+            <li class="list-group-item bg-transparent"><a href="{{ url_for('church_fathers') }}" class="text-decoration-none">Patristic Timeline</a></li>
+            <li class="list-group-item bg-transparent"><a href="{{ url_for('sources') }}" class="text-decoration-none">Magisterial Documents</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

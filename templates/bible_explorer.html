@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Bible Explorer - ARISE Catholic Apologetics{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">Bible Explorer & Proof-Texts</h1>
+    <p class="text-muted mb-0">Search key Biblical passages used in Catholic apologetics defenses</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Search Form -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form action="{{ url_for('bible_explorer') }}" method="GET" class="row g-3">
+        <div class="col-md-9">
+          <div class="input-group">
+            <span class="input-group-text bg-body text-muted"><i class="bi bi-book"></i></span>
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search book, verse, or keyword (e.g. Matthew 16, John 6, 2 Thess 2:15, James 2:24)...">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <button type="submit" class="btn btn-gold w-100"><i class="bi bi-search me-1"></i> Search Scripture</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scriptures Table / Cards -->
+  {% if scriptures %}
+  <div class="row g-4">
+    {% for scrip in scriptures %}
+    <div class="col-md-6">
+      <div class="scholarly-box h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge badge-gold fs-6"><i class="bi bi-bookmark-fill me-1"></i> {{ scrip.citation }}</span>
+            {% if scrip.article %}
+            <span class="badge badge-category">{{ scrip.article.category.name }}</span>
+            {% endif %}
+          </div>
+          <blockquote class="quote-block my-3">
+            "{{ scrip.passage_text }}"
+          </blockquote>
+          {% if scrip.catholic_interpretation %}
+          <div class="small text-muted mb-3">
+            <strong>Catholic Interpretation:</strong> {{ scrip.catholic_interpretation }}
+          </div>
+          {% endif %}
+        </div>
+
+        {% if scrip.article %}
+        <div class="pt-2 border-top text-end">
+          <a href="{{ url_for('article_detail', slug=scrip.article.slug) }}" class="btn btn-outline-gold btn-sm">
+            View Article: {{ scrip.article.title }} &rarr;
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+    <h3 class="h5 brand-font text-muted">No scripture passages match your query</h3>
+    <a href="{{ url_for('bible_explorer') }}" class="btn btn-outline-gold btn-sm mt-2">Clear Search</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

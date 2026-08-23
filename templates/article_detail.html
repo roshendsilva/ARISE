@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }} - ARISE Apologetics{% endblock %}
+
+{% block content %}
+<!-- Article Banner -->
+<div class="article-header-banner">
+  <div class="container">
+    <div class="d-flex align-items-center gap-2 mb-2">
+      <span class="badge badge-gold"><i class="bi bi-tag-fill me-1"></i> {{ article.category.name }}</span>
+      <span class="small text-light opacity-75"><i class="bi bi-calendar3 me-1"></i> {{ article.created_at.strftime('%B %d, %Y') }}</span>
+    </div>
+    <h1 class="h2 brand-font text-white mb-3">{{ article.title }}</h1>
+    
+    <!-- Action Bar -->
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-outline-gold btn-sm" data-bs-toggle="modal" data-bs-target="#citationModal">
+        <i class="bi bi-quote me-1"></i> Cite Article
+      </button>
+      <button class="btn btn-outline-light btn-sm" onclick="shareArticle('{{ article.title }}', window.location.href)">
+        <i class="bi bi-share me-1"></i> Share
+      </button>
+      <div class="ms-auto col-12 col-sm-auto mt-2 mt-sm-0">
+        <input type="text" id="article-search-input" class="form-control form-control-sm bg-dark text-light border-secondary" placeholder="Search in article...">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Sticky Table of Contents Sidebar -->
+    <div class="col-lg-3 d-none d-lg-block">
+      <div class="toc-sidebar">
+        <div class="toc-title"><i class="bi bi-list-nested me-1"></i> Table of Contents</div>
+        <ul class="toc-list">
+          <li><a href="#section-question" class="active">1. The Question</a></li>
+          <li><a href="#section-protestant">2. External & Common Views</a></li>
+          <li><a href="#section-answer">3. Short Answer</a></li>
+          <li><a href="#section-catholic">4. Catholic Teaching</a></li>
+          <li><a href="#section-scripture">5. Biblical Evidence</a></li>
+          <li><a href="#section-objection">6. Objections & Response</a></li>
+          <li><a href="#section-patristic">7. Church Fathers</a></li>
+          <li><a href="#section-catechism">8. Catechism & Councils</a></li>
+          <li><a href="#section-sources">9. Sources & References</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Main 8-Section Scholarly Reading View -->
+    <div class="col-lg-9 article-content">
+      
+      <!-- 1. The Question -->
+      <div class="scholarly-box" id="section-question">
+        <div class="scholarly-box-title"><i class="bi bi-patch-question-fill text-warning"></i> 1. The Theological Question</div>
+        <div class="lead serif-body text-heading fw-semibold">{{ article.question | render_md | safe }}</div>
+      </div>
+
+      <!-- 2. Common External / Non-Catholic View -->
+      {% if article.what_protestants_believe %}
+      <div class="scholarly-box" id="section-protestant">
+        <div class="scholarly-box-title"><i class="bi bi-info-circle-fill text-warning"></i> 2. Common Objections & External Perspectives</div>
+        <div>{{ article.what_protestants_believe | render_md | safe }}</div>
+      </div>
+      {% endif %}
+
+      <!-- 3. Executive Short Answer -->
+      <div class="scholarly-box" id="section-answer">
+        <div class="scholarly-box-title"><i class="bi bi-check-circle-fill text-warning"></i> 3. Short Answer / Executive Defense</div>
+        <div class="p-3 bg-body-tertiary border-start border-4 border-warning rounded">
+          <div class="mb-0 fw-semibold">{{ article.short_answer | render_md | safe }}</div>
+        </div>
+      </div>
+
+      <!-- 4. Official Catholic Teaching -->
+      <div class="scholarly-box" id="section-catholic">
+        <div class="scholarly-box-title"><i class="bi bi-bank2 text-warning"></i> 4. Official Catholic Teaching</div>
+        <div>{{ article.catholic_teaching | render_md | safe }}</div>
+      </div>
+
+      <!-- 5. Biblical Evidence & Exegesis -->
+      {% if article.biblical_evidence %}
+      <div class="scholarly-box" id="section-scripture">
+        <div class="scholarly-box-title"><i class="bi bi-book-fill text-warning"></i> 5. Scriptural Proof-Texts & Biblical Evidence</div>
+        <div class="lh-lg">
+          {{ article.biblical_evidence | render_md | safe }}
+        </div>
+
+        {% if article.scripture_references %}
+        <div class="mt-3">
+          <h5 class="h6 brand-font text-gold mb-2">Key Scripture References:</h5>
+          <div class="list-group">
+            {% for scrip in article.scripture_references %}
+            <div class="list-group-item bg-body-tertiary border-0 mb-2 rounded">
+              <strong class="text-warning">{{ scrip.citation }}</strong>: 
+              <span class="fst-italic">"{{ scrip.passage_text }}"</span>
+              {% if scrip.catholic_interpretation %}
+              <div class="small text-muted mt-1"><strong>Interpretation:</strong> {{ scrip.catholic_interpretation | render_md | safe }}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- 6. Objections & Catholic Responses -->
+      {% if article.objection or article.catholic_response %}
+      <div class="scholarly-box" id="section-objection">
+        <div class="scholarly-box-title"><i class="bi bi-shield-x text-warning"></i> 6. Common Objections & Catholic Refutation</div>
+        {% if article.objection %}
+        <div class="alert alert-secondary border-0 mb-3">
+          <strong>Objection:</strong> {{ article.objection | render_md | safe }}
+        </div>
+        {% endif %}
+        {% if article.catholic_response %}
+        <div>
+          <strong>Catholic Response:</strong>
+          <div class="mt-2">{{ article.catholic_response | render_md | safe }}</div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- 7. Church Fathers / Early Church Evidence -->
+      {% if article.early_church_evidence %}
+      <div class="scholarly-box" id="section-patristic">
+        <div class="scholarly-box-title"><i class="bi bi-hourglass-split text-warning"></i> 7. Witness of the Early Church Fathers</div>
+        <div>{{ article.early_church_evidence | render_md | safe }}</div>
+      </div>
+      {% endif %}
+
+      <!-- 8. Catechism (CCC) & Council Decrees -->
+      {% if article.catechism_text or article.historical_documents %}
+      <div class="scholarly-box" id="section-catechism">
+        <div class="scholarly-box-title"><i class="bi bi-journal-bookmark-fill text-warning"></i> 8. Catechism (CCC) & Ecumenical Councils</div>
+        {% if article.catechism_text %}
+        <div class="mb-3">{{ article.catechism_text | render_md | safe }}</div>
+        {% endif %}
+        {% if article.historical_documents %}
+        <div class="mt-3">
+          <h5 class="h6 brand-font text-gold">Historical & Council Documents:</h5>
+          <div>{{ article.historical_documents | render_md | safe }}</div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- 9. Sources & Primary Citations -->
+      <div class="scholarly-box" id="section-sources">
+        <div class="scholarly-box-title"><i class="bi bi-file-earmark-text-fill text-warning"></i> 9. Primary Sources & References</div>
+        {% if article.sources %}
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Source Title</th>
+                <th>Author / Body</th>
+                <th>Period</th>
+                <th>Document / Reference</th>
+                <th>Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for src in article.sources %}
+              <tr>
+                <td><strong>{{ src.source_title }}</strong></td>
+                <td>{{ src.author or '—' }}</td>
+                <td><span class="badge bg-secondary-subtle text-secondary">{{ src.date_period or '—' }}</span></td>
+                <td>{{ src.work_document }} ({{ src.section_ref }})</td>
+                <td><span class="badge badge-gold">{{ src.source_type }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="small text-muted">Primary sources verified against Vulgate, Patrologia Graeca/Latina, and CCC.</p>
+        {% endif %}
+
+        {% if article.conclusion %}
+        <div class="mt-4 pt-3 border-top">
+          <h5 class="h6 brand-font text-gold">Theological Conclusion:</h5>
+          <div class="fst-italic text-muted mb-0">{{ article.conclusion | render_md | safe }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+
+      <!-- Related Articles -->
+      {% if related_articles %}
+      <div class="mt-5">
+        <h3 class="h5 brand-font text-warning mb-3">Related Theological Defenses</h3>
+        <div class="row g-3">
+          {% for rel in related_articles %}
+          <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-body">
+                <span class="badge badge-category mb-2">{{ rel.category.name }}</span>
+                <h4 class="h6 brand-font"><a href="{{ url_for('article_detail', slug=rel.slug) }}" class="text-decoration-none text-reset">{{ rel.title }}</a></h4>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- Citation Generator Modal -->
+<div class="modal fade" id="citationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header navbar-arise text-white">
+        <h5 class="modal-title brand-font"><i class="bi bi-quote text-warning me-2"></i> Academic Citation Generator</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="small text-muted">Select a citation style below to copy formatted scholarly references for papers, articles, or discussions:</p>
+        
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-dark text-start" onclick="copyCitation('catholic', '{{ article.title }}', 'ARISE', window.location.href)">
+            <strong>Catholic Scholarly Format</strong>
+            <div class="small text-muted">ARISE Apologetics. "{{ article.title }}." Catholic Theological Defense.</div>
+          </button>
+          
+          <button class="btn btn-outline-dark text-start" onclick="copyCitation('mla', '{{ article.title }}', 'ARISE', window.location.href)">
+            <strong>MLA 9th Edition</strong>
+            <div class="small text-muted">ARISE Research Team. "{{ article.title }}." ARISE Platform.</div>
+          </button>
+          
+          <button class="btn btn-outline-dark text-start" onclick="copyCitation('apa', '{{ article.title }}', 'ARISE', window.location.href)">
+            <strong>APA 7th Edition</strong>
+            <div class="small text-muted">ARISE Platform. (2026). {{ article.title }}.</div>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

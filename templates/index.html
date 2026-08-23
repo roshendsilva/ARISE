@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}ARISE - Seek Truth. Know the Faith. Defend the Faith.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center">
+  <div class="container">
+    <div class="mb-3">
+      <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ARISE Emblem" class="hero-logo-img">
+    </div>
+    <div class="badge badge-gold px-3 py-2 rounded-pill mb-3">Catholic Apologetics & Theological Research</div>
+    <h1 class="hero-title mb-2">ARISE</h1>
+    <div class="hero-tagline mb-4">Seek Truth. Know the Faith. Defend the Faith.</div>
+    <p class="lead max-w-700 mx-auto text-light opacity-90 mb-4">
+      An academic, evidence-based platform for exploring Scripture, Early Church Fathers, Catechism, and Council decrees to defend Catholic doctrine.
+    </p>
+
+    <!-- Hero Global Search Bar -->
+    <div class="hero-search-box">
+      <form action="{{ url_for('global_search') }}" method="GET">
+        <div class="input-group">
+          <input type="text" name="q" class="form-control" placeholder="Search across Scripture, Church Fathers, Doctrines, and Objections..." required>
+          <button type="submit" class="btn btn-gold">
+            <i class="bi bi-search me-1"></i> Search
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    <div class="mt-4 d-flex justify-content-center flex-wrap gap-3">
+      <a href="{{ url_for('apologetics') }}" class="btn btn-gold"><i class="bi bi-compass me-1"></i> Explore Apologetics</a>
+      <a href="{{ url_for('ask_apologist') }}" class="btn btn-warning fw-bold text-dark"><i class="bi bi-question-diamond-fill me-1"></i> Ask an Apologist</a>
+      <a href="{{ url_for('objections') }}" class="btn btn-outline-light"><i class="bi bi-patch-question me-1"></i> Common Objections</a>
+    </div>
+  </div>
+</section>
+
+<!-- Trust Pillars Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="trust-pillar-card">
+          <div class="trust-pillar-icon"><i class="bi bi-journal-bookmark-fill"></i></div>
+          <h4 class="h5 brand-font mb-2">Scriptural Grounding</h4>
+          <p class="small text-muted mb-0">Every defense is rooted in canonical Scripture, addressing proof-texts and explaining Catholic hermeneutics clearly.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="trust-pillar-card">
+          <div class="trust-pillar-icon"><i class="bi bi-hourglass-split"></i></div>
+          <h4 class="h5 brand-font mb-2">Patristic Witness</h4>
+          <p class="small text-muted mb-0">Uncover what 1st-4th century Apostolic Fathers and Christian martyrs believed regarding Eucharist, Church, and Tradition.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="trust-pillar-card">
+          <div class="trust-pillar-icon"><i class="bi bi-bank2"></i></div>
+          <h4 class="h5 brand-font mb-2">Magisterial Authority</h4>
+          <p class="small text-muted mb-0">Verified quotes from the Catechism of the Catholic Church (CCC), Ecumenical Councils (Nicaea, Ephesus, Trent), and Papal decrees.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Explore By Topic Grid -->
+<section class="py-5 bg-body-tertiary border-top border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h2 class="h3 brand-font mb-1">Explore by Topic</h2>
+        <p class="text-muted mb-0">Select a theological domain to begin your research</p>
+      </div>
+      <a href="{{ url_for('apologetics') }}" class="btn btn-outline-gold btn-sm d-none d-md-inline-block">View All Categories &rarr;</a>
+    </div>
+
+    <div class="row g-4">
+      {% for category in categories %}
+      <div class="col-6 col-lg-3">
+        <a href="{{ url_for('category_detail', slug=category.slug) }}" class="category-card">
+          <div class="category-icon">
+            <i class="bi {{ category.icon }}"></i>
+          </div>
+          <div class="category-title">{{ category.name }}</div>
+          <div class="category-desc">{{ category.description[:75] }}...</div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Apologetic Defenses -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="badge badge-gold mb-2">Essential Defenses</span>
+        <h2 class="h3 brand-font mb-1">Featured Articles</h2>
+      </div>
+      <a href="{{ url_for('apologetics') }}" class="btn btn-gold btn-sm">Browse All Articles &rarr;</a>
+    </div>
+
+    <div class="row g-4">
+      {% for article in featured_articles %}
+      <div class="col-md-6 col-lg-3">
+        <div class="article-card">
+          <div class="article-card-header">
+            <span class="badge badge-category mb-2">{{ article.category.name }}</span>
+            <h3 class="h5 brand-font"><a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-reset">{{ article.title }}</a></h3>
+          </div>
+          <div class="article-card-body">
+            <p class="small text-muted mb-0">{{ article.short_answer[:120] }}...</p>
+          </div>
+          <div class="article-card-footer d-flex justify-content-between align-items-center">
+            <span class="small text-muted"><i class="bi bi-clock me-1"></i> Scholarly Review</span>
+            <a href="{{ url_for('article_detail', slug=article.slug) }}" class="btn btn-link btn-sm p-0 text-warning text-decoration-none font-weight-bold">Read &rarr;</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Objection Quick Selector Section -->
+<section class="py-5 bg-body-tertiary">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-5">
+        <span class="badge badge-gold mb-2">Interactive Tool</span>
+        <h2 class="h3 brand-font mb-3">Popular Objections & Challenges</h2>
+        <p class="text-muted">Explore concise, evidence-based answers to common non-Catholic, secular, and theological challenges to the Catholic faith.</p>
+        <a href="{{ url_for('objections') }}" class="btn btn-gold"><i class="bi bi-layers-fill me-1"></i> Open Objection Explorer</a>
+      </div>
+      <div class="col-lg-7">
+        <div class="list-group shadow-sm border-0">
+          {% for obj in objections %}
+          <div class="list-group-item p-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-start">
+              <h5 class="h6 mb-1 brand-font text-warning"><i class="bi bi-question-circle-fill me-2"></i>"{{ obj.objection_text }}"</h5>
+            </div>
+            <p class="small text-muted mb-1">{{ obj.short_rebuttal[:140] }}...</p>
+            {% if obj.article %}
+            <a href="{{ url_for('article_detail', slug=obj.article.slug) }}" class="small text-gold text-decoration-none">Read Full Defense &rarr;</a>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

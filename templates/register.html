@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Register Account - ARISE Catholic Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header navbar-arise text-white text-center py-4">
+          <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ARISE Logo" class="login-logo-img mb-3 d-block mx-auto">
+          <h2 class="h4 brand-font mb-0">Create ARISE Account</h2>
+          <span class="small text-gold">Join our Catholic research community</span>
+        </div>
+        <div class="card-body p-4">
+          <form action="{{ url_for('register') }}" method="POST">
+            <div class="mb-3">
+              <label for="username" class="form-label fw-semibold">Full Name / Username <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-body text-muted"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control" id="username" name="username" placeholder="e.g., Augustine" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <span class="input-group-text bg-body text-muted"><i class="bi bi-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-body text-muted"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Create password" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="confirm_password" class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-body text-muted"><i class="bi bi-check2-square"></i></span>
+                  <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-2.5 fw-bold text-navy">
+              Create Account &rarr;
+            </button>
+          </form>
+
+          <hr class="my-4 border-secondary-subtle">
+
+          <div class="text-center">
+            <p class="small text-muted mb-2">Already registered?</p>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-gold btn-sm px-4">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to Account
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results for "{{ q }}" - ARISE{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">Search Results for "{{ q }}"</h1>
+    <p class="text-muted mb-0">Querying across Defense Articles, Scriptures, Church Fathers, Objections, and Sources</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Articles Results -->
+  <div class="mb-5">
+    <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-journal-text me-2"></i> Defense Articles ({{ articles|length }})</h2>
+    {% if articles %}
+    <div class="row g-3">
+      {% for article in articles %}
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <span class="badge badge-category mb-2">{{ article.category.name }}</span>
+            <h3 class="h5 brand-font"><a href="{{ url_for('article_detail', slug=article.slug) }}" class="text-decoration-none text-reset">{{ article.title }}</a></h3>
+            <p class="small text-muted mb-0">{{ article.short_answer[:120] }}...</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="small text-muted">No defense articles matched your search query.</p>
+    {% endif %}
+  </div>
+
+  <!-- Scripture Passages Results -->
+  <div class="mb-5">
+    <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-book me-2"></i> Scripture Proof-Texts ({{ scriptures|length }})</h2>
+    {% if scriptures %}
+    <div class="row g-3">
+      {% for scrip in scriptures %}
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <strong class="text-warning">{{ scrip.citation }}</strong>
+            <p class="small fst-italic my-2">"{{ scrip.passage_text }}"</p>
+            {% if scrip.article %}
+            <a href="{{ url_for('article_detail', slug=scrip.article.slug) }}" class="small text-gold text-decoration-none">Read related article &rarr;</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="small text-muted">No scripture passages matched your search query.</p>
+    {% endif %}
+  </div>
+
+  <!-- Objections Results -->
+  <div class="mb-5">
+    <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-patch-question me-2"></i> Objections ({{ objections|length }})</h2>
+    {% if objections %}
+    <div class="list-group shadow-sm border-0">
+      {% for obj in objections %}
+      <div class="list-group-item p-3 border-bottom">
+        <h3 class="h6 brand-font text-warning">"{{ obj.objection_text }}"</h3>
+        <p class="small text-muted mb-1">{{ obj.short_rebuttal }}</p>
+        {% if obj.article %}
+        <a href="{{ url_for('article_detail', slug=obj.article.slug) }}" class="small text-gold text-decoration-none">Read Full Defense &rarr;</a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="small text-muted">No objections matched your search query.</p>
+    {% endif %}
+  </div>
+
+  <!-- Church Fathers Results -->
+  <div class="mb-5">
+    <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-hourglass-split me-2"></i> Church Fathers ({{ fathers|length }})</h2>
+    {% if fathers %}
+    <div class="row g-3">
+      {% for father in fathers %}
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body">
+            <h3 class="h6 brand-font text-gold">{{ father.name }} ({{ father.era }})</h3>
+            <p class="small text-muted mb-0">{{ father.biography[:100] }}...</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="small text-muted">No Church Fathers matched your search query.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

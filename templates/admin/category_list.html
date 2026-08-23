@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - ARISE Admin Portal{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container d-flex justify-content-between align-items-center">
+    <div>
+      <h1 class="h2 brand-font mb-1">Categories Management</h1>
+      <p class="text-muted mb-0">Organize theological topics and defense domains</p>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Add Category Form -->
+    <div class="col-md-4">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-navy text-white">
+          <h3 class="h6 brand-font text-gold mb-0"><i class="bi bi-plus-circle me-1"></i> Add Category</h3>
+        </div>
+        <div class="card-body">
+          <form action="{{ url_for('admin_categories') }}" method="POST">
+            <div class="mb-3">
+              <label for="name" class="form-label fw-semibold">Category Name *</label>
+              <input type="text" class="form-control" id="name" name="name" required placeholder="e.g. Sacramental Theology">
+            </div>
+            <div class="mb-3">
+              <label for="slug" class="form-label fw-semibold">Slug</label>
+              <input type="text" class="form-control" id="slug" name="slug" placeholder="sacramental-theology">
+            </div>
+            <div class="mb-3">
+              <label for="icon" class="form-label fw-semibold">Bootstrap Icon Class</label>
+              <input type="text" class="form-control" id="icon" name="icon" value="bi-book" placeholder="bi-water, bi-bank, etc.">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label fw-semibold">Short Summary</label>
+              <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="overview" class="form-label fw-semibold">About [Topic] Detailed Overview (Markdown)</label>
+              <textarea class="form-control" id="overview" name="overview" rows="4" placeholder="Detailed introductory overview explaining dogmas, background, and core definitions..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100"><i class="bi bi-check-lg me-1"></i> Save Category</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category List Table -->
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>Icon</th>
+                  <th>Name</th>
+                  <th>Slug</th>
+                  <th>Articles Count</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for cat in categories %}
+                <tr>
+                  <td><i class="bi {{ cat.icon }} fs-4 text-warning"></i></td>
+                  <td><strong>{{ cat.name }}</strong></td>
+                  <td><code>{{ cat.slug }}</code></td>
+                  <td><span class="badge bg-secondary">{{ cat.articles|length }} articles</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

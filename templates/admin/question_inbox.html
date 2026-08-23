@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Apologetics Question Inbox - ARISE Admin{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+    <div>
+      <h1 class="h3 brand-font mb-1"><i class="bi bi-inbox-fill text-gold me-2"></i> Apologetics Question Inbox</h1>
+      <p class="text-muted small mb-0">Review user questions, draft official responses, and publish them to the public archive.</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+      <a href="{{ url_for('admin_articles') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-file-earmark-text me-1"></i> Articles</a>
+      <a href="{{ url_for('ask_apologist') }}" target="_blank" class="btn btn-gold btn-sm"><i class="bi bi-box-arrow-up-right me-1"></i> Public Portal</a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Status Filter Pills -->
+  <div class="d-flex gap-2 mb-4">
+    <a href="{{ url_for('admin_questions') }}" class="btn btn-sm {% if not current_status %}btn-gold{% else %}btn-outline-secondary{% endif %}">
+      All Questions
+    </a>
+    <a href="{{ url_for('admin_questions', status='Pending') }}" class="btn btn-sm {% if current_status == 'Pending' %}btn-gold{% else %}btn-outline-secondary{% endif %}">
+      Pending
+    </a>
+    <a href="{{ url_for('admin_questions', status='Answered') }}" class="btn btn-sm {% if current_status == 'Answered' %}btn-gold{% else %}btn-outline-secondary{% endif %}">
+      Answered
+    </a>
+    <a href="{{ url_for('admin_questions', status='Published') }}" class="btn btn-sm {% if current_status == 'Published' %}btn-gold{% else %}btn-outline-secondary{% endif %}">
+      Published
+    </a>
+  </div>
+
+  {% if questions %}
+  <div class="row g-4">
+    {% for q in questions %}
+    <div class="col-12">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-body-tertiary p-3 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="badge {% if q.status == 'Pending' %}bg-warning text-dark{% elif q.status == 'Published' %}bg-success{% else %}bg-info text-dark{% endif %} me-2">
+              {{ q.status }}
+            </span>
+            <span class="badge bg-gold text-navy me-2">{{ q.category.name if q.category else 'General' }}</span>
+            <strong class="text-body me-2">#ARISE-Q{{ q.id }}</strong>
+            <span class="small text-muted">{{ q.created_at.strftime('%b %d, %Y at %H:%M') }}</span>
+          </div>
+          <div>
+            <form action="{{ url_for('admin_delete_question', id=q.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this question submission?');">
+              <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2"><i class="bi bi-trash"></i> Delete</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <h5 class="h6 brand-font text-gold mb-1"><i class="bi bi-patch-question me-1"></i> {{ q.question_title }}</h5>
+              <div class="small text-muted mb-2">From: <strong>{{ q.user_name }}</strong> ({{ q.user_email }})</div>
+              
+              <div class="p-3 bg-body-tertiary rounded-3 border mb-3">
+                <strong class="small text-muted d-block mb-1">User's Inquiry:</strong>
+                <p class="small mb-0">{{ q.detailed_question }}</p>
+              </div>
+
+              {% if q.ai_synthesized_answer %}
+              <div class="p-3 bg-body-secondary rounded-3 border">
+                <strong class="small text-warning d-block mb-1"><i class="bi bi-cpu me-1"></i> Auto-Matched Vault Synthesis:</strong>
+                <div class="small serif-body text-muted">
+                  {{ q.ai_synthesized_answer | render_md | safe }}
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6 border-start-md">
+              <h5 class="h6 brand-font text-warning mb-2"><i class="bi bi-pencil-square me-1"></i> Draft Official Response</h5>
+              <form action="{{ url_for('admin_answer_question', id=q.id) }}" method="POST">
+                <div class="mb-3">
+                  <textarea class="form-control" name="official_answer" rows="6" placeholder="Write scholarly response grounded in Scripture, Fathers, and CCC paragraphs..." required>{{ q.official_answer or '' }}</textarea>
+                </div>
+                <div class="row g-2 align-items-center">
+                  <div class="col-md-6">
+                    <select class="form-select form-select-sm" name="status">
+                      <option value="Published" {% if q.status == 'Published' %}selected{% endif %}>Published (Visible Publicly)</option>
+                      <option value="Answered" {% if q.status == 'Answered' %}selected{% endif %}>Answered (Internal)</option>
+                      <option value="Pending" {% if q.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 text-end">
+                    <button type="submit" class="btn btn-gold btn-sm fw-bold w-100">
+                      <i class="bi bi-save me-1"></i> Save & Publish Answer
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-5 bg-body-tertiary rounded-4 border">
+    <i class="bi bi-inbox fs-1 text-gold mb-2 d-block opacity-50"></i>
+    <h4 class="h5 brand-font mb-1">No Questions Found</h4>
+    <p class="small text-muted mb-0">No question submissions match the selected filter.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

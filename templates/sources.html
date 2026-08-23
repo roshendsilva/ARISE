@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Sources & References Directory - ARISE{% endblock %}
+
+{% block content %}
+<div class="bg-body-secondary py-4 border-bottom">
+  <div class="container">
+    <h1 class="h2 brand-font mb-1">Sources & Document Repository</h1>
+    <p class="text-muted mb-0">Index of verified historical, patristic, conciliar, and scriptural sources</p>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Type Filter & Search -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <form action="{{ url_for('sources') }}" method="GET" class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-body text-muted"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search title, author, or document...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select name="type" class="form-select" onchange="this.form.submit()">
+            <option value="all" {% if type_filter == 'all' %}selected{% endif %}>All Source Types</option>
+            <option value="Scripture" {% if type_filter == 'Scripture' %}selected{% endif %}>Scripture</option>
+            <option value="Catechism" {% if type_filter == 'Catechism' %}selected{% endif %}>Catechism (CCC)</option>
+            <option value="Church Father" {% if type_filter == 'Church Father' %}selected{% endif %}>Church Fathers</option>
+            <option value="Ecumenical Council" {% if type_filter == 'Ecumenical Council' %}selected{% endif %}>Ecumenical Councils</option>
+            <option value="Historical Source" {% if type_filter == 'Historical Source' %}selected{% endif %}>Historical Documents</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-gold w-100">Filter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sources Table -->
+  {% if sources %}
+  <div class="table-responsive bg-body border rounded shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-dark">
+        <tr>
+          <th>Source Title</th>
+          <th>Author / Authority</th>
+          <th>Date / Period</th>
+          <th>Work / Reference</th>
+          <th>Source Type</th>
+          <th>Related Article</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for src in sources %}
+        <tr>
+          <td><strong>{{ src.source_title }}</strong></td>
+          <td>{{ src.author or '—' }}</td>
+          <td><span class="badge bg-secondary-subtle text-secondary">{{ src.date_period or '—' }}</span></td>
+          <td>{{ src.work_document }} ({{ src.section_ref }})</td>
+          <td><span class="badge badge-gold">{{ src.source_type }}</span></td>
+          <td>
+            {% if src.article %}
+            <a href="{{ url_for('article_detail', slug=src.article.slug) }}" class="btn btn-outline-gold btn-sm">View Article &rarr;</a>
+            {% else %}
+            <span class="text-muted small">General</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <i class="bi bi-file-earmark-x fs-1 text-muted d-block mb-3"></i>
+    <h3 class="h5 brand-font text-muted">No sources match your criteria</h3>
+    <a href="{{ url_for('sources') }}" class="btn btn-outline-gold btn-sm mt-2">Reset Filter</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
