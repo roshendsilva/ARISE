@@ -483,27 +483,47 @@ h1, h2, h3, h4, .brand-font {
 
 /* Footer */
 .footer-arise {
-  background-color: var(--navy-primary);
-  color: #e2e8f0;
+  background-color: #0b1329 !important;
+  color: #f1f5f9 !important;
   border-top: 3px solid var(--gold-bright);
   padding: 3rem 0 1.5rem 0;
   margin-top: 5rem;
 }
 
+.footer-arise h4,
 .footer-arise h5 {
-  color: var(--gold-bright);
-  font-size: 1.1rem;
+  color: var(--gold-bright) !important;
+  font-size: 1.15rem;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
+.footer-arise p,
+.footer-arise .text-muted,
+.footer-arise small,
+.footer-arise .small {
+  color: #cbd5e1 !important;
+  opacity: 0.95;
+}
+
+.footer-arise em,
+.footer-arise i {
+  color: #e2e8f0 !important;
+}
+
 .footer-arise a {
-  color: #cbd5e1;
+  color: #e2e8f0 !important;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .footer-arise a:hover {
-  color: var(--gold-bright);
+  color: var(--gold-bright) !important;
+  text-decoration: underline;
+}
+
+.footer-arise .border-top {
+  border-top-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* Animations */

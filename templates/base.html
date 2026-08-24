@@ -150,13 +150,13 @@
         <div class="col-lg-4">
           <div class="d-flex align-items-center mb-3">
             <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ARISE Logo" class="footer-logo-img me-2">
-            <h4 class="brand-font mb-0 text-white">ARISE</h4>
+            <h4 class="brand-font mb-0 text-gold fs-3">ARISE</h4>
           </div>
-          <p class="small text-muted mb-3">Apologetics for the Reasoned Interpretation of Scripture & Explanation.</p>
-          <p class="small text-muted"><em>"Always be prepared to make a defense to any one who calls you to account for the hope that is in you, yet do it with gentleness and reverence."</em> — 1 Peter 3:15</p>
+          <p class="small text-light-silver mb-3">Apologetics for the Reasoned Interpretation of Scripture & Explanation.</p>
+          <p class="small text-light-silver"><em>"Always be prepared to make a defense to any one who calls you to account for the hope that is in you, yet do it with gentleness and reverence."</em> — 1 Peter 3:15</p>
         </div>
         <div class="col-lg-2 col-6">
-          <h5>Platform</h5>
+          <h5 class="text-gold">Platform</h5>
           <ul class="list-unstyled small">
             <li class="mb-2"><a href="{{ url_for('apologetics') }}">Apologetics Library</a></li>
             <li class="mb-2"><a href="{{ url_for('ask_apologist') }}" class="text-gold fw-semibold"><i class="bi bi-question-diamond-fill me-1"></i> Ask an Apologist</a></li>
@@ -167,7 +167,7 @@
           </ul>
         </div>
         <div class="col-lg-3 col-6">
-          <h5>Popular Topics</h5>
+          <h5 class="text-gold">Popular Topics</h5>
           <ul class="list-unstyled small">
             {% for cat in all_categories[:5] %}
             <li class="mb-2"><a href="{{ url_for('category_detail', slug=cat.slug) }}">{{ cat.name }}</a></li>
@@ -175,15 +175,15 @@
           </ul>
         </div>
         <div class="col-lg-3">
-          <h5>Research Integrity</h5>
-          <p class="small text-muted">ARISE is dedicated to verified patristic evidence, authentic scripture citations, and magisterial documents of the Catholic Church.</p>
+          <h5 class="text-gold">Research Integrity</h5>
+          <p class="small text-light-silver mb-3">ARISE is dedicated to verified patristic evidence, authentic scripture citations, and magisterial documents of the Catholic Church.</p>
           <div class="d-flex gap-2">
             <a href="{{ url_for('about') }}" class="btn btn-outline-gold btn-sm"><i class="bi bi-book me-1"></i> Learn Methodology</a>
           </div>
         </div>
       </div>
-      <hr class="my-4 border-secondary">
-      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-muted">
+      <hr class="my-4 border-secondary opacity-50">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-light-silver">
         <div>&copy; 2026 ARISE Catholic Apologetics Platform. All rights reserved.</div>
         <div class="mt-2 mt-sm-0">Designed for scholarly, evidence-based Catholic defense.</div>
       </div>
