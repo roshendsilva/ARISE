@@ -26,8 +26,9 @@ def render_md_filter(text):
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'admin_login'
-login_manager.login_message_category = 'warning'
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please sign in or create an account to submit your question to our apologetics team.'
+login_manager.login_message_category = 'info'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -465,7 +466,7 @@ def admin_categories():
 @login_required
 def ask_apologist():
     # If logged in as Admin, redirect directly to Question Inbox to view & answer user questions
-    if current_user.is_admin and request.args.get('view') != 'public' and request.method == 'GET':
+    if current_user.is_authenticated and getattr(current_user, 'is_admin', False) and request.args.get('view') != 'public' and request.method == 'GET':
         return redirect(url_for('admin_questions'))
 
     submitted_submission = None
