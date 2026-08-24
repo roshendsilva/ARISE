@@ -29,6 +29,13 @@ class Config:
         except Exception:
             pass
         
+    # Ensure sslmode=require for Supabase cloud PostgreSQL connections on Vercel
+    if "sqlite" not in db_url and "sslmode" not in db_url:
+        if "?" in db_url:
+            db_url += "&sslmode=require"
+        else:
+            db_url += "?sslmode=require"
+
     SQLALCHEMY_DATABASE_URI = db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PORT = int(os.environ.get('PORT', 5001))
