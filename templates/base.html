@@ -190,6 +190,88 @@
     </div>
   </footer>
 
+  <!-- Floating Side Donation Button Widget -->
+  <div class="floating-donate-widget">
+    <button type="button" class="btn btn-donate-floating rounded-pill px-3 py-2 border-2 border-white d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#donationModal" title="Support ARISE Ministry">
+      <i class="bi bi-heart-fill text-danger fs-5 animate-pulse"></i>
+      <span class="d-none d-sm-inline fw-bold">Support ARISE</span>
+    </button>
+  </div>
+
+  <!-- Unfixed Support & Donation Modal -->
+  <div class="modal fade" id="donationModal" tabindex="-1" aria-labelledby="donationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-gradient-dark text-white p-4" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-warning bg-opacity-20 p-2 border border-warning">
+              <i class="bi bi-heart-fill text-warning fs-3"></i>
+            </div>
+            <div>
+              <h5 class="modal-title h5 brand-font text-warning mb-0" id="donationModalLabel">Support ARISE Ministry</h5>
+              <small class="text-light text-opacity-75">Defend & Spread Authentic Catholic Truth</small>
+            </div>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="scholarly-box bg-body-tertiary p-3 rounded-3 mb-3 border border-warning border-opacity-25">
+            <p class="small text-muted mb-0">
+              <strong>Your Support Matters:</strong> ARISE is an uncompromised, evidence-based apologetics platform. Your generous support empowers us to research, preserve, and defend historical Christian truth, maintain our cloud servers, and serve seekers worldwide with free scholarly apologetics.
+            </p>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-gold">Choose Contribution Amount (USD)</label>
+            <div class="d-flex flex-wrap gap-2 mb-2" id="presetDonationAmounts">
+              <button type="button" class="btn btn-outline-warning btn-sm px-3 rounded-pill donate-amt-btn" onclick="setDonationAmt(10)">$10</button>
+              <button type="button" class="btn btn-outline-warning btn-sm px-3 rounded-pill donate-amt-btn active" onclick="setDonationAmt(25)">$25</button>
+              <button type="button" class="btn btn-outline-warning btn-sm px-3 rounded-pill donate-amt-btn" onclick="setDonationAmt(50)">$50</button>
+              <button type="button" class="btn btn-outline-warning btn-sm px-3 rounded-pill donate-amt-btn" onclick="setDonationAmt(100)">$100</button>
+            </div>
+            <div class="input-group">
+              <span class="input-group-text bg-body text-gold fw-bold">$</span>
+              <input type="number" class="form-control" id="customDonationAmount" value="25" min="1" placeholder="Enter unfixed custom amount">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="donorMessage" class="form-label fw-semibold small">Prayer Request or Note for Founder Roshen (Optional)</label>
+            <textarea class="form-control form-control-sm" id="donorMessage" rows="2" placeholder="Leave a note or prayer request for Roshen D'silva..."></textarea>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button type="button" onclick="submitSupportEmail()" class="btn btn-warning py-2 text-dark fw-bold rounded-pill">
+              <i class="bi bi-heart-fill text-danger me-1"></i> Proceed to Contribute
+            </button>
+            <button type="button" class="btn btn-sm btn-link text-muted text-decoration-none" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+        <div class="modal-footer bg-body-tertiary justify-content-center py-2 border-top">
+          <small class="text-muted" style="font-size: 0.78rem;">
+            <i class="bi bi-shield-lock-fill text-success me-1"></i> For bank transfer or custom giving details, contact <a href="mailto:roshendsilvamac@gmail.com" class="text-warning">roshendsilvamac@gmail.com</a>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setDonationAmt(amt) {
+      document.getElementById('customDonationAmount').value = amt;
+      const btns = document.querySelectorAll('.donate-amt-btn');
+      btns.forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+
+    function submitSupportEmail() {
+      const amt = document.getElementById('customDonationAmount').value || '25';
+      const msg = encodeURIComponent(document.getElementById('donorMessage').value || '');
+      const mailtoUrl = `mailto:roshendsilvamac@gmail.com?subject=ARISE%20Ministry%20Contribution%20(%24${amt})&body=Hi%20Roshen%2C%0A%0AI%20would%20like%20to%20support%20ARISE%20Catholic%20Apologetics%20with%20a%20contribution%20of%20%24${amt}.%0A%0ANote%2FPrayer%20Request%3A%20${msg}`;
+      window.location.href = mailtoUrl;
+    }
+  </script>
+
   <!-- Bootstrap 5 JS Bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Custom ARISE JS -->
