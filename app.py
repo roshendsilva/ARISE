@@ -462,9 +462,10 @@ def admin_categories():
 # ==================== ASK AN APOLOGIST ROUTES ====================
 
 @app.route('/ask-an-apologist', methods=['GET', 'POST'])
+@login_required
 def ask_apologist():
     # If logged in as Admin, redirect directly to Question Inbox to view & answer user questions
-    if current_user.is_authenticated and current_user.is_admin and request.args.get('view') != 'public' and request.method == 'GET':
+    if current_user.is_admin and request.args.get('view') != 'public' and request.method == 'GET':
         return redirect(url_for('admin_questions'))
 
     submitted_submission = None
