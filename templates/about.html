@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}About ARISE - Founder, Mission & Methodology{% endblock %}
+{% block title %}About ARISE - Mission, Vision & Platform Details{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
@@ -23,58 +23,43 @@
     <!-- Left Main Column -->
     <div class="col-lg-8">
       
-      <!-- Founder & Leadership Highlight -->
-      <div class="card shadow-sm border-0 mb-4 overflow-hidden">
-        <div class="card-header bg-gradient-dark text-warning border-0 p-4" style="background: linear-gradient(135deg, #1b263b 0%, #0d1b2a 100%);">
-          <div class="d-flex align-items-center">
-            <div class="rounded-circle bg-warning bg-opacity-10 p-3 me-3 border border-warning">
-              <i class="bi bi-person-fill-gear text-warning fs-1"></i>
-            </div>
-            <div>
-              <h2 class="h3 brand-font text-warning mb-1">Founder & Executive Director</h2>
-              <p class="text-light text-opacity-75 mb-0">Meet the Vision Behind ARISE Apologetics</p>
-            </div>
-          </div>
-        </div>
-        <div class="card-body p-4">
-          <div class="row align-items-center">
-            <div class="col-md-8">
-              <h3 class="h4 brand-font text-gold mb-2">Roshen D'silva</h3>
-              <p class="badge bg-secondary mb-3">Lead Apologist & Platform Founder</p>
-              <p class="mb-3">
-                <strong>Roshen D'silva</strong> established ARISE to provide seekers, scholars, non-Catholic inquirers, and Catholics worldwide with a rigorous, uncompromisingly orthodox, and historically grounded apologetics repository.
-              </p>
-              <p class="small text-muted mb-3">
-                Driven by 1 Peter 3:15 (<em>"Always be prepared to give a defense to anyone who asks you for a reason for the hope that is in you"</em>), Roshen designed ARISE to bridge the gap between deep Patristic theology and accessible modern digital engagement.
-              </p>
-              <div class="d-flex flex-wrap gap-2 align-items-center pt-2 border-top">
-                <a href="mailto:roshendsilvamac@gmail.com" class="btn btn-sm btn-outline-warning text-gold rounded-pill px-3">
-                  <i class="bi bi-envelope-at-fill me-1"></i> roshendsilvamac@gmail.com
-                </a>
-                <a href="{{ url_for('ask_apologist') }}" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill px-3">
-                  <i class="bi bi-chat-left-quote-fill me-1"></i> Ask Roshen a Question
-                </a>
-              </div>
-            </div>
-            <div class="col-md-4 text-center mt-3 mt-md-0 border-start-md">
-              <div class="p-3 bg-body-tertiary rounded-3 border">
-                <i class="bi bi-journal-bookmark-fill text-warning fs-1 d-block mb-2"></i>
-                <h6 class="brand-font mb-1">Direct Contact</h6>
-                <p class="small text-muted mb-2">Have research or apologetics questions?</p>
-                <a href="mailto:roshendsilvamac@gmail.com" class="small fw-semibold text-warning text-decoration-none d-block text-truncate">
-                  roshendsilvamac@gmail.com
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- Mission & Vision -->
+      <div class="scholarly-box mb-4">
+        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-compass-fill me-2"></i> Mission & Vision</h2>
+        <p>In an era often dominated by superficial debates and theological misunderstandings, <strong>ARISE</strong> elevates apologetics back to its historic dignity: integrating biblical exegesis, patristic archaeology, and magisterial documents to demonstrate the truth, beauty, and coherence of the Catholic Faith.</p>
+        <p>Whether examining Marian dogmas, Papal primacy, Sacramental theology, or Sola Scriptura, ARISE answers objections with charitable clarity while serving as an open repository for all seekers, scholars, Orthodox, secular, and non-Catholic inquirers.</p>
       </div>
 
-      <!-- Our Mission & Vision -->
+      <!-- Platform Features & Structure -->
       <div class="scholarly-box mb-4">
-        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-compass-fill me-2"></i> Mission & Purpose</h2>
-        <p>In an era often dominated by superficial debates and theological misunderstandings, ARISE elevates apologetics back to its historic dignity: integrating biblical exegesis, patristic archaeology, and magisterial documents to demonstrate the truth, beauty, and coherence of the Catholic Faith.</p>
-        <p>Whether examining Marian dogmas, Papal primacy, Sacramental theology, or Sola Scriptura, ARISE answers objections with charitable clarity while serving as an open resource for all truth-seekers.</p>
+        <h2 class="h4 brand-font text-warning mb-3"><i class="bi bi-layers-fill me-2"></i> Platform Features & Vault Architecture</h2>
+        <p>The ARISE platform provides a comprehensive theological research suite designed for deep study and effective defense:</p>
+        <div class="row g-3 my-2">
+          <div class="col-md-6">
+            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
+              <h5 class="h6 brand-font text-gold"><i class="bi bi-journal-bookmark-fill me-1"></i> 88 Scholarly Topics</h5>
+              <p class="small text-muted mb-0">Structured defenses spanning Marian dogmas, Scripture, Church authority, Eucharist, and Early Christianity.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
+              <h5 class="h6 brand-font text-gold"><i class="bi bi-book-half me-1"></i> Scripture & Patristic Vault</h5>
+              <p class="small text-muted mb-0">Direct cross-references to original Greek and Hebrew texts, Church Fathers (AD 90–800), and Ecumenical Councils.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
+              <h5 class="h6 brand-font text-gold"><i class="bi bi-chat-left-quote-fill me-1"></i> Ask an Apologist Portal</h5>
+              <p class="small text-muted mb-0">Interactive Q&A engine providing instant repository evidence matches and verified responses.</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 bg-body-tertiary rounded-3 border h-100">
+              <h5 class="h6 brand-font text-gold"><i class="bi bi-database-check me-1"></i> Cloud Database Infrastructure</h5>
+              <p class="small text-muted mb-0">Powered by Supabase PostgreSQL for high-speed, reliable, global access to all articles and references.</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Content Integrity Standard -->
@@ -111,6 +96,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
     <!-- Right Sidebar Column -->
@@ -128,44 +114,38 @@
         </div>
       </div>
 
-      <!-- Quick Contact Info Card -->
+      <!-- Quick Platform Details Card -->
       <div class="card shadow-sm border-0 mb-4">
         <div class="card-header bg-body-tertiary fw-bold border-bottom">
-          <i class="bi bi-card-heading text-warning me-2"></i> Platform Details
+          <i class="bi bi-card-heading text-warning me-2"></i> Platform Specifications
         </div>
         <ul class="list-group list-group-flush small">
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="text-muted">Founder</span>
-            <span class="fw-semibold text-gold">Roshen D'silva</span>
+            <span class="text-muted">Apologetics Topics</span>
+            <span class="badge bg-warning text-dark">88 Topics</span>
           </li>
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="text-muted">Email</span>
-            <a href="mailto:roshendsilvamac@gmail.com" class="text-decoration-none text-warning text-truncate ms-2" style="max-width: 170px;">
-              roshendsilvamac@gmail.com
-            </a>
+            <span class="text-muted">Primary Categories</span>
+            <span class="fw-semibold text-gold">8 Vaults</span>
           </li>
           <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="text-muted"><i class="bi bi-wallet2 text-success me-1"></i> GPay</span>
-            <span class="fw-bold text-warning font-monospace">8848790974</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="text-muted">Articles</span>
-            <span class="badge bg-warning text-dark">88 Scholarly Topics</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="text-muted">Database</span>
+            <span class="text-muted">Database Engine</span>
             <span class="badge bg-success">Supabase PostgreSQL</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span class="text-muted">Access Model</span>
+            <span class="text-muted">Open Educational Vault</span>
           </li>
         </ul>
       </div>
 
       <!-- Navigation Quick Links -->
-      <div class="card shadow-sm border-0">
+      <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
           <h3 class="h5 brand-font text-warning mb-3"><i class="bi bi-compass me-2"></i> Explore Platform</h3>
           <div class="d-grid gap-2">
             <a href="{{ url_for('apologetics') }}" class="btn btn-outline-secondary btn-sm text-start">
-              <i class="bi bi-journal-text me-2 text-warning"></i> 88 Apologetics Topics
+              <i class="bi bi-journal-text me-2 text-warning"></i> Apologetics Library
             </a>
             <a href="{{ url_for('bible_explorer') }}" class="btn btn-outline-secondary btn-sm text-start">
               <i class="bi bi-book me-2 text-warning"></i> Scripture Proof-Texts
@@ -181,6 +161,14 @@
       </div>
 
     </div>
+  </div>
+
+  <!-- Bottom Attribution & Contact Line -->
+  <div class="border-top pt-4 mt-2 text-center text-muted small">
+    <p class="mb-0">
+      <i class="bi bi-code-slash text-warning me-1"></i> Platform Creator: <strong class="text-gold">Roshen D'silva</strong> &nbsp;|&nbsp; 
+      <i class="bi bi-envelope-fill text-warning me-1"></i> Contact: <a href="mailto:roshendsilvamac@gmail.com" class="text-warning text-decoration-none fw-semibold">roshendsilvamac@gmail.com</a>
+    </p>
   </div>
 </div>
 {% endblock %}
