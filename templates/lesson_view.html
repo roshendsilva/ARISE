@@ -41,7 +41,7 @@
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="sideModHead{{ module.id }}">
                                 <button class="accordion-button bg-light small fw-bold text-navy py-2 {% if module.id != lesson.module_id %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sideModCollapse{{ module.id }}">
-                                    Mod {{ module.order }}: {% if module.title.startswith('Module') %}{{ module.title.split(':', 1)[-1].strip() }}{% else %}{{ module.title }}{% endif %}
+                                    Mod {{ module.order }}: {{ module.title }}
                                 </button>
                             </h2>
                             <div id="sideModCollapse{{ module.id }}" class="accordion-collapse collapse {% if module.id == lesson.module_id %}show{% endif %}">
