@@ -1,134 +1,110 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}{{ course.title }} — ARISE Catholic Formation{% endblock %}
+{% block title %}{{ course.title }} — ARISE Formation Academy{% endblock %}
 
 {% block content %}
-<div class="bg-navy-darker text-white py-5 mb-5 border-bottom border-gold-subtle">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb breadcrumb-dark mb-3">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-gold-light">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('courses') }}" class="text-gold-light">Courses</a></li>
-            <li class="breadcrumb-item active text-white" aria-current="page">{{ course.title }}</li>
-          </ol>
-        </nav>
-        <h1 class="display-4 fw-bold font-serif mb-3">{{ course.title }}</h1>
-        <p class="lead text-gold-light mb-4">{{ course.description }}</p>
-        <div class="d-flex flex-wrap gap-4 text-white-50 small">
-          <div><i class="bi bi-journal-text text-gold me-1"></i> {{ total_lessons }} Masterclass Lessons (4,000+ words each)</div>
-          <div><i class="bi bi-award text-gold me-1"></i> Final Assessment & Certificate Included</div>
-          <div><i class="bi bi-person-check text-gold me-1"></i> Passing Score: {{ course.passing_score }}%</div>
-        </div>
-      </div>
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-gold">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('courses') }}" class="text-gold">Courses</a></li>
+      <li class="breadcrumb-item active text-white" aria-current="page">{{ course.title }}</li>
+    </ol>
+  </nav>
 
-      <div class="col-lg-4 mt-4 mt-lg-0">
-        <div class="card card-arise shadow-lg border-0 rounded-4 p-4 text-center">
+  <!-- Course Hero Section -->
+  <div class="card bg-dark text-white border-secondary shadow-lg rounded-4 overflow-hidden mb-5">
+    <div class="card-body p-4 p-lg-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <span class="badge bg-warning text-dark fw-bold px-3 py-1 mb-3 rounded-pill text-uppercase">{{ course.category }}</span>
+          <h1 class="display-5 fw-extrabold text-white mb-3" style="font-family: 'Cinzel', serif;">{{ course.title }}</h1>
+          <p class="lead text-slate-300 mb-4" style="color: #cbd5e1; font-size: 1.15rem;">{{ course.description }}</p>
+          
+          <div class="d-flex flex-wrap gap-4 text-slate-400 small mb-4">
+            <div><i class="bi bi-person-circle text-gold me-1"></i> <strong>Instructor:</strong> {{ course.instructor }}</div>
+            <div><i class="bi bi-clock-fill text-gold me-1"></i> <strong>Duration:</strong> {{ course.estimated_duration }}</div>
+            <div><i class="bi bi-bar-chart-fill text-gold me-1"></i> <strong>Level:</strong> {{ course.difficulty }}</div>
+            <div><i class="bi bi-journal-text text-gold me-1"></i> <strong>Curriculum:</strong> {{ lessons|length }} Masterclass Lessons</div>
+          </div>
+
           {% if current_user.is_authenticated %}
-          <h4 class="font-serif fw-bold text-navy mb-2">Your Progress</h4>
-          <div class="progress mb-2" style="height: 12px;">
-            <div class="progress-bar bg-gold" role="progressbar" style="width: {{ progress_pct }}%;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
-          </div>
-          <div class="d-flex justify-content-between small text-muted mb-4">
-            <span>{{ completed_count }} of {{ total_lessons }} Lessons Complete</span>
-            <span class="fw-bold text-gold">{{ progress_pct }}%</span>
-          </div>
+            {% if progress_percentage > 0 %}
+            <div class="mb-4 max-w-md">
+              <div class="d-flex justify-content-between text-sm mb-1">
+                <span class="text-muted">Your Course Progress</span>
+                <span class="text-gold fw-bold">{{ progress_percentage }}% Complete</span>
+              </div>
+              <div class="progress" style="height: 8px; background-color: #334155;">
+                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ progress_percentage }}%;"></div>
+              </div>
+            </div>
+            {% endif %}
 
-          {% if user_course_prog and user_course_prog.is_completed %}
-          <a href="{{ url_for('certificate_view', cert_id=user_course_prog.certificate_id) }}" class="btn btn-gold btn-lg w-100 fw-bold rounded-pill mb-2">
-            <i class="bi bi-award-fill me-2"></i> Download Certificate
-          </a>
-          {% elif course.lessons %}
-          <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=course.lessons[0].slug) }}" class="btn btn-gold btn-lg w-100 fw-bold rounded-pill mb-2">
-            {% if completed_count > 0 %}Continue Course{% else %}Start Course Now{% endif %}
-          </a>
+            {% if user_certificate %}
+            <div class="alert alert-success bg-dark border-success text-white d-flex align-items-center justify-content-between p-3 rounded-3 mb-4">
+              <div>
+                <i class="bi bi-award-fill text-warning fs-3 me-2"></i>
+                <strong>Certificate Earned!</strong> You completed this course on {{ user_certificate.issue_date.strftime('%B %d, %Y') }}.
+              </div>
+              <a href="{{ url_for('view_certificate', certificate_id=user_certificate.certificate_id) }}" class="btn btn-warning btn-sm fw-bold">
+                View Certificate <i class="bi bi-box-arrow-up-right ms-1"></i>
+              </a>
+            </div>
+            {% endif %}
           {% endif %}
+        </div>
 
-          <a href="{{ url_for('final_assessment', slug=course.slug) }}" class="btn btn-outline-navy btn-sm w-100 rounded-pill mt-2">
-            <i class="bi bi-pencil-square me-1"></i> Take 30-Question Final Exam
-          </a>
-          {% else %}
-          <h4 class="font-serif fw-bold text-navy mb-2">Enroll in Course</h4>
-          <p class="small text-muted mb-4">Sign in to track your progress, take lesson quizzes, and earn your Arise Certificate of Completion.</p>
-          <a href="{{ url_for('login') }}" class="btn btn-gold btn-lg w-100 fw-bold rounded-pill mb-2">
-            Sign In to Enroll
-          </a>
-          <a href="{{ url_for('register') }}" class="btn btn-outline-navy btn-sm w-100 rounded-pill">
-            Create Free Account
-          </a>
-          {% endif %}
+        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+          <div class="p-4 bg-slate-900 border border-secondary rounded-4 shadow">
+            <i class="bi bi-mortarboard-fill display-1 text-gold mb-3 d-block"></i>
+            <h4 class="h5 fw-bold text-white mb-2">Masterclass Curriculum</h4>
+            <p class="small text-muted mb-4">Complete all 10 lessons and quizzes to earn your verified Arise Formation Certificate.</p>
+            {% if lessons %}
+            <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=lessons[0].slug) }}" class="btn btn-gold btn-lg w-100 fw-bold shadow-sm">
+              <i class="bi bi-play-circle-fill me-2"></i> Start Course
+            </a>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="container mb-5">
-  <div class="row g-4">
-    <div class="col-lg-8">
-      <h2 class="font-serif fw-bold text-navy mb-4 border-bottom pb-2">
-        <i class="bi bi-list-task text-gold me-2"></i> Course Syllabus & Lessons
-      </h2>
+  <!-- Curriculum List -->
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card bg-dark text-white border-secondary shadow-lg rounded-4 p-4">
+        <h3 class="h4 fw-bold text-gold mb-4" style="font-family: 'Cinzel', serif;">
+          <i class="bi bi-list-stars me-2"></i> Course Curriculum & Lessons
+        </h3>
 
-      <div class="list-group shadow-sm border-0 rounded-4 overflow-hidden mb-5">
-        {% for l in course.lessons %}
-        {% set is_comp = l.id in completed_lesson_ids %}
-        <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=l.slug) }}" class="list-group-item list-group-item-action p-4 border-bottom border-light hover-bg-light">
-          <div class="d-flex align-items-center justify-content-between">
+        <div class="list-group list-group-flush">
+          {% for l in lessons %}
+          {% set is_completed = (l.id in completed_lesson_ids) %}
+          <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=l.slug) }}" class="list-group-item list-group-item-action bg-dark text-white border-secondary py-3 px-3 rounded-3 mb-2 d-flex align-items-center justify-content-between hover-bg-slate-800" style="transition: background-color 0.2s ease;">
             <div class="d-flex align-items-center gap-3">
-              <div class="rounded-circle {% if is_comp %}bg-success text-white{% else %}bg-navy-light text-navy{% endif %} d-flex align-items-center justify-content-center fw-bold" style="width: 42px; height: 42px;">
-                {% if is_comp %}<i class="bi bi-check-lg"></i>{% else %}{{ l.lesson_number }}{% endif %}
-              </div>
+              {% if is_completed %}
+                <span class="badge bg-success rounded-circle p-2"><i class="bi bi-check-lg fs-6"></i></span>
+              {% else %}
+                <span class="badge bg-secondary text-gold rounded-circle px-3 py-2 fw-bold" style="font-size: 0.9rem;">{{ l.lesson_number }}</span>
+              {% endif %}
               <div>
-                <h5 class="mb-1 font-serif fw-bold text-navy hover-gold">{{ l.title }}</h5>
-                <div class="small text-muted">
-                  <span class="me-3"><i class="bi bi-clock me-1 text-gold"></i> {{ l.estimated_time }}</span>
-                  <span><i class="bi bi-file-text me-1 text-gold"></i> 4,000+ Words Substantive Article</span>
-                </div>
+                <h5 class="mb-1 text-white fw-bold h6">{{ l.title }}</h5>
+                <span class="text-muted small"><i class="bi bi-clock me-1 text-gold"></i> {{ l.estimated_reading_time }} • Full Scholarly Masterclass</span>
               </div>
             </div>
             <div>
-              {% if is_comp %}
-              <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill">Completed</span>
+              {% if is_completed %}
+                <span class="badge bg-success-subtle text-success border border-success small"><i class="bi bi-check-circle-fill me-1"></i> Completed</span>
               {% else %}
-              <span class="btn btn-sm btn-outline-navy rounded-pill">Read Lesson</span>
+                <span class="btn btn-outline-gold btn-sm"><i class="bi bi-book me-1"></i> Read Lesson</span>
               {% endif %}
             </div>
-          </div>
-        </a>
-        {% endfor %}
-      </div>
-
-      <div class="card card-arise border-0 shadow-sm rounded-4 p-4">
-        <h3 class="font-serif fw-bold text-navy h4 mb-3">Course Overview & Requirements</h3>
-        <div class="text-secondary article-markdown">
-          {{ course.overview|render_md|safe }}
+          </a>
+          {% endfor %}
         </div>
-      </div>
-    </div>
-
-    <div class="col-lg-4">
-      <div class="card card-arise border-0 shadow-sm rounded-4 p-4 mb-4">
-        <h4 class="font-serif fw-bold text-navy h5 mb-3">Course Features</h4>
-        <ul class="list-unstyled text-secondary small mb-0 d-grid gap-3">
-          <li class="d-flex align-items-start gap-2">
-            <i class="bi bi-check-circle-fill text-gold fs-5"></i>
-            <div><strong>10 Long-Form Masterclasses</strong><br>Every lesson exceeds 4,000 words of authentic Catholic scholarship.</div>
-          </li>
-          <li class="d-flex align-items-start gap-2">
-            <i class="bi bi-check-circle-fill text-gold fs-5"></i>
-            <div><strong>Lesson Quizzes</strong><br>Test your comprehension at the end of each lesson.</div>
-          </li>
-          <li class="d-flex align-items-start gap-2">
-            <i class="bi bi-check-circle-fill text-gold fs-5"></i>
-            <div><strong>30-Question Final Exam</strong><br>Comprehensive assessment requiring 70%+ score to pass.</div>
-          </li>
-          <li class="d-flex align-items-start gap-2">
-            <i class="bi bi-check-circle-fill text-gold fs-5"></i>
-            <div><strong>Official Certificate</strong><br>Earn an Arise Certificate of Completion with verification ID.</div>
-          </li>
-        </ul>
       </div>
     </div>
   </div>

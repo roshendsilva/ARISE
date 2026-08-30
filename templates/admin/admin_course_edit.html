@@ -1,56 +1,68 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}New Course{% endif %} — Admin Portal{% endblock %}
+{% block title %}Admin — Create / Edit Course{% endblock %}
 
 {% block content %}
-<div class="bg-navy-darker text-white py-4 mb-4">
-  <div class="container">
-    <a href="{{ url_for('admin_courses') }}" class="text-gold-light small text-decoration-none"><i class="bi bi-arrow-left me-1"></i> Back to Courses</a>
-    <h1 class="h3 font-serif fw-bold mb-0 text-white mt-1">{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}</h1>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+    <h1 class="h3 fw-bold text-warning mb-0" style="font-family: 'Cinzel', serif;">
+      <i class="bi bi-pencil-square me-2"></i> Create New Course
+    </h1>
+    <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Back to Courses
+    </a>
   </div>
-</div>
 
-<div class="container mb-5">
-  <div class="card card-arise border-0 shadow-sm rounded-4 p-4 max-w-3xl mx-auto">
-    <form method="POST">
-      <div class="mb-3">
-        <label class="form-label fw-bold text-navy">Course Title</label>
-        <input type="text" name="title" class="form-control" value="{{ course.title if course else '' }}" required>
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card bg-dark text-white border-secondary shadow-lg rounded-4 p-4 p-md-5">
+        <form action="{{ url_for('admin_course_new') }}" method="POST">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label text-gold fw-bold">Course Title</label>
+              <input type="text" name="title" class="form-control bg-slate-900 text-white border-secondary" placeholder="e.g., Marian Dogmas & Catholic Apologetics" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gold fw-bold">URL Slug</label>
+              <input type="text" name="slug" class="form-control bg-slate-900 text-white border-secondary" placeholder="e.g., marian-dogmas" required>
+            </div>
+            
+            <div class="col-md-4">
+              <label class="form-label text-gold fw-bold">Category</label>
+              <input type="text" name="category" class="form-control bg-slate-900 text-white border-secondary" value="Catholic Theology">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gold fw-bold">Difficulty</label>
+              <select name="difficulty" class="form-select bg-slate-900 text-white border-secondary">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate" selected>Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label text-gold fw-bold">Estimated Duration</label>
+              <input type="text" name="estimated_duration" class="form-control bg-slate-900 text-white border-secondary" value="10 Hours">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-gold fw-bold">Short Description</label>
+              <input type="text" name="short_description" class="form-control bg-slate-900 text-white border-secondary" placeholder="Brief 1-sentence overview for cards">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label text-gold fw-bold">Full Course Description</label>
+              <textarea name="description" rows="4" class="form-control bg-slate-900 text-white border-secondary" placeholder="Comprehensive course introduction..."></textarea>
+            </div>
+          </div>
+
+          <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-warning btn-lg fw-bold px-5">
+              <i class="bi bi-save-fill me-2"></i> Save Course
+            </button>
+          </div>
+        </form>
       </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-navy">URL Slug</label>
-        <input type="text" name="slug" class="form-control" value="{{ course.slug if course else '' }}" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-navy">Course Level</label>
-        <select name="level" class="form-select">
-          <option value="Beginner / Intermediate" {% if course and course.level == 'Beginner / Intermediate' %}selected{% endif %}>Beginner / Intermediate</option>
-          <option value="Intermediate / Advanced" {% if course and course.level == 'Intermediate / Advanced' %}selected{% endif %}>Intermediate / Advanced</option>
-          <option value="Masterclass Formation" {% if course and course.level == 'Masterclass Formation' %}selected{% endif %}>Masterclass Formation</option>
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-navy">Passing Score (%)</label>
-        <input type="number" name="passing_score" class="form-control" value="{{ course.passing_score if course else 70 }}" min="50" max="100" required>
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label fw-bold text-navy">Short Description</label>
-        <textarea name="description" class="form-control" rows="3" required>{{ course.description if course else '' }}</textarea>
-      </div>
-
-      <div class="mb-4">
-        <label class="form-label fw-bold text-navy">Detailed Course Overview (Markdown Supported)</label>
-        <textarea name="overview" class="form-control" rows="8">{{ course.overview if course else '' }}</textarea>
-      </div>
-
-      <button type="submit" class="btn btn-gold fw-bold px-4 py-2 rounded-pill">
-        {% if course %}Save Course Changes{% else %}Create Course{% endif %}
-      </button>
-    </form>
+    </div>
   </div>
 </div>
 {% endblock %}

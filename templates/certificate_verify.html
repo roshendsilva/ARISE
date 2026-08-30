@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Certificate — ARISE Formation Academy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+      <div class="card bg-dark text-white border-secondary shadow-lg rounded-4 p-4 p-md-5">
+        <i class="bi bi-shield-lock-fill display-3 text-gold mb-3 d-block"></i>
+        <h1 class="display-6 fw-bold text-white mb-2" style="font-family: 'Cinzel', serif;">Certificate Verification Portal</h1>
+        <p class="text-muted mb-4">Enter an official ARISE Certificate ID to verify its authenticity and completion details.</p>
+
+        <!-- Search Form -->
+        <form action="{{ url_for('verify_certificate', certificate_id='') }}" method="GET" class="mb-5" onsubmit="this.action='/verify/' + document.getElementById('cert_input').value.trim();">
+          <div class="input-group input-group-lg max-w-md mx-auto shadow-lg">
+            <input type="text" id="cert_input" class="form-control bg-slate-900 text-white border-secondary font-monospace text-uppercase" placeholder="e.g. ARISE-CERT-2026-XXXXX" value="{{ searched_id or '' }}" required>
+            <button type="submit" class="btn btn-gold fw-bold px-4">Verify Now</button>
+          </div>
+        </form>
+
+        {% if cert %}
+        <!-- Verified Certificate Box -->
+        <div class="alert alert-success bg-slate-900 border-success text-white text-start p-4 rounded-4 shadow">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="badge bg-success text-white px-3 py-2 text-uppercase font-monospace fs-6">
+              <i class="bi bi-check-circle-fill me-1"></i> Verified Genuine Certificate
+            </span>
+            <span class="text-muted small">ID: <strong class="text-gold font-monospace">{{ cert.certificate_id }}</strong></span>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Student Name</span>
+              <h4 class="h5 fw-bold text-white mb-0">{{ cert.user_name }}</h4>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Course Completed</span>
+              <h4 class="h5 fw-bold text-gold mb-0">{{ cert.course_title }}</h4>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Issue Date</span>
+              <strong class="text-white">{{ cert.issue_date.strftime('%B %d, %Y') }}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Issuing Institution</span>
+              <strong class="text-white">ARISE Catholic Apologetics Academy</strong>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top border-secondary text-end">
+            <a href="{{ url_for('view_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-warning btn-sm fw-bold">
+              <i class="bi bi-eye-fill me-1"></i> View Full Official Certificate
+            </a>
+          </div>
+        </div>
+
+        {% elif searched_id %}
+        <!-- Invalid Certificate Box -->
+        <div class="alert alert-danger bg-slate-900 border-danger text-white text-start p-4 rounded-4 shadow">
+          <div class="d-flex align-items-center gap-3">
+            <i class="bi bi-x-circle-fill display-4 text-danger"></i>
+            <div>
+              <h4 class="h5 fw-bold text-danger mb-1">Certificate Not Found</h4>
+              <p class="small text-slate-300 mb-0">No record was found for Certificate ID <strong>"{{ searched_id }}"</strong>. Please verify the ID code and try again.</p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

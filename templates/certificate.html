@@ -3,153 +3,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Certificate of Completion — {{ user.username }}</title>
+  <title>Certificate of Completion — {{ cert.user_name }} — ARISE</title>
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Great+Vibes&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Montserrat:wght@400;500;600;700&display=swap');
-    
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+      .certificate-container { border: 12px double #b45309 !important; box-shadow: none !important; }
+    }
     body {
-      background-color: #0b132b;
-      font-family: 'Montserrat', sans-serif;
-      color: #1a2536;
-      padding: 40px 15px;
+      background-color: #0b0f19;
+      color: #1e293b;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    
     .certificate-container {
-      max-width: 960px;
-      margin: 0 auto;
-      background: #ffffff;
+      background: #fffdfa;
+      width: 100%;
+      max-width: 950px;
       padding: 50px 60px;
-      border: 15px solid #0f1c3f;
-      outline: 4px solid #c5a059;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      border: 15px double #d97706;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
       position: relative;
+      overflow: hidden;
     }
-
-    .border-inner {
-      border: 2px solid #c5a059;
-      padding: 40px;
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Cinzel', serif;
+      font-size: 14rem;
+      font-weight: 900;
+      color: rgba(217, 119, 6, 0.04);
+      user-select: none;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .cert-content {
       position: relative;
+      z-index: 1;
     }
-
     .cert-title {
       font-family: 'Cinzel', serif;
       font-weight: 900;
-      color: #0f1c3f;
-      letter-spacing: 2px;
+      letter-spacing: 3px;
+      color: #92400e;
     }
-
     .student-name {
       font-family: 'Cinzel', serif;
       font-weight: 700;
-      color: #c5a059;
-      font-size: 2.8rem;
-      border-bottom: 2px solid #c5a059;
+      font-size: 2.5rem;
+      color: #0f172a;
+      border-bottom: 2px solid #d97706;
       display: inline-block;
       padding-bottom: 5px;
-      margin: 20px 0;
+      margin: 15px 0;
     }
-
-    .course-title {
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      color: #0f1c3f;
+    .signature-font {
+      font-family: 'Great Vibes', cursive;
       font-size: 2.2rem;
-    }
-
-    .cert-seal {
-      width: 110px;
-      height: 110px;
-      background: radial-gradient(circle, #d4af37, #996515);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-      border: 3px solid #ffffff;
-    }
-
-    @media print {
-      body { background: none; padding: 0; }
-      .no-print { display: none !important; }
-      .certificate-container { box-shadow: none; margin: 0; width: 100%; max-width: 100%; }
+      color: #b45309;
     }
   </style>
 </head>
 <body>
 
-<div class="text-center mb-4 no-print">
-  <button onclick="window.print()" class="btn btn-warning btn-lg fw-bold rounded-pill px-4 shadow">
-    <i class="bi bi-printer-fill me-2"></i> Print / Save Certificate as PDF
-  </button>
-  <a href="{{ url_for('my_learning') }}" class="btn btn-outline-light btn-lg rounded-pill px-4 ms-2">
-    Back to Dashboard
-  </a>
-</div>
-
-<div class="certificate-container">
-  <div class="border-inner text-center">
-    
-    <!-- ARISE Logo Header -->
-    <div class="mb-3">
-      <h2 class="cert-title fs-1 mb-1">✝️ ARISE</h2>
-      <p class="text-uppercase tracking-wider small fw-bold text-muted mb-0">Catholic Apologetics & Formation Academy</p>
-    </div>
-
-    <hr class="my-4" style="border-top: 2px solid #c5a059; opacity: 0.8;">
-
-    <h3 class="text-uppercase text-muted tracking-wider fs-5 mb-3">Certificate of Completion</h3>
-    
-    <p class="text-muted fs-6 mb-1">This certificate is officially presented to</p>
-
-    <div class="student-name">{{ user.username }}</div>
-
-    <p class="text-muted fs-6 mb-2">for successfully completing the comprehensive 10-lesson Catholic formation course</p>
-
-    <div class="course-title mb-4">{{ course.title }}</div>
-
-    <p class="small text-secondary max-w-xl mx-auto mb-5">
-      Demonstrating mastery in Catholic ecclesiology, Sacred Scripture, Sacred Tradition, Apostolic Succession, the Papacy, Church history, Sacramental theology, and Catholic apologetic defense.
-    </p>
-
-    <!-- Signatures & Verification -->
-    <div class="row align-items-end justify-content-between mt-5 pt-3">
-      <div class="col-4 text-start">
-        <div class="fw-bold text-navy border-bottom border-dark pb-1 mb-1">Roshen D'silva</div>
-        <div class="small text-muted">Director & Founder, ARISE</div>
-      </div>
-
-      <div class="col-4 d-flex justify-content-center">
-        <div class="cert-seal text-center flex-column">
-          <i class="bi bi-award fs-2"></i>
-          <span style="font-size: 0.65rem; letter-spacing: 1px;">VERIFIED</span>
-        </div>
-      </div>
-
-      <div class="col-4 text-end">
-        <div class="fw-bold text-navy border-bottom border-dark pb-1 mb-1">
-          {% if prog.completed_at %}{{ prog.completed_at.strftime('%B %d, %Y') }}{% else %}August 2026{% endif %}
-        </div>
-        <div class="small text-muted">Date of Completion</div>
-      </div>
-    </div>
-
-    <!-- Certificate ID & Disclaimer -->
-    <div class="mt-5 pt-4 border-top text-muted" style="font-size: 0.72rem;">
-      <div><strong>Certificate ID:</strong> {{ prog.certificate_id }} | <strong>Final Score:</strong> {{ prog.final_score }}%</div>
-      <div class="mt-1 text-secondary">
-        This certificate recognizes completion of an educational course offered by Arise. It is not an academic degree, government qualification, or ecclesiastical credential.
-      </div>
-    </div>
-
+  <!-- Top Action Bar -->
+  <div class="no-print mb-4 d-flex gap-3">
+    <button onclick="window.print()" class="btn btn-warning btn-lg fw-bold shadow">
+      <i class="bi bi-printer-fill me-2"></i> Print / Save as PDF
+    </button>
+    <a href="{{ url_for('verify_certificate', certificate_id=cert.certificate_id) }}" target="_blank" class="btn btn-outline-light btn-lg fw-bold">
+      <i class="bi bi-patch-check-fill text-warning me-2"></i> Verify Authenticity
+    </a>
+    <a href="{{ url_for('my_learning') }}" class="btn btn-secondary btn-lg fw-bold">
+      <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+    </a>
   </div>
-</div>
+
+  <!-- Printable Certificate Container -->
+  <div class="certificate-container text-center">
+    <div class="watermark">ARISE</div>
+
+    <div class="cert-content">
+      <!-- Header Crest -->
+      <div class="mb-3">
+        <i class="bi bi-award-fill text-warning display-4"></i>
+        <h2 class="h4 fw-extrabold text-uppercase text-dark mt-2 tracking-widest" style="font-family: 'Cinzel', serif; letter-spacing: 4px;">ARISE</h2>
+        <p class="text-muted small text-uppercase tracking-wider" style="font-size: 0.8rem; letter-spacing: 2px;">Catholic Apologetics & Formation Academy</p>
+      </div>
+
+      <!-- Main Certificate Title -->
+      <h1 class="cert-title display-5 my-3 text-uppercase">Certificate of Completion</h1>
+
+      <p class="lead text-secondary my-3" style="font-size: 1.15rem;">This official certificate is proudly presented to</p>
+
+      <!-- Student Name -->
+      <div class="student-name px-4">{{ cert.user_name }}</div>
+
+      <p class="lead text-secondary my-3" style="font-size: 1.1rem;">
+        for successfully completing the rigorous 10-lesson formation course
+      </p>
+
+      <!-- Course Title -->
+      <h3 class="h2 fw-bold text-dark my-3" style="font-family: 'Cinzel', serif; color: #1e293b;">
+        {{ cert.course_title }}
+      </h3>
+
+      <p class="text-muted small max-w-xl mx-auto my-4" style="max-width: 650px;">
+        Demonstrating mastery in Biblical defense, Sacred Tradition, Apostolic Succession, Church History, and Catholic Apologetics through academic reading and knowledge assessment.
+      </p>
+
+      <!-- Footer Info & Signatures -->
+      <div class="row align-items-end mt-5 pt-4 border-top border-warning">
+        <div class="col-4 text-start">
+          <span class="d-block small text-muted text-uppercase">Date Issued</span>
+          <strong class="text-dark">{{ cert.issue_date.strftime('%B %d, %Y') }}</strong>
+          <span class="d-block small text-muted mt-2">Certificate ID:</span>
+          <span class="font-monospace fw-bold text-amber-700" style="color: #b45309;">{{ cert.certificate_id }}</span>
+        </div>
+
+        <div class="col-4 text-center">
+          <div class="p-2 border border-warning rounded-circle d-inline-block bg-white shadow-sm mb-1">
+            <i class="bi bi-shield-check text-warning fs-1"></i>
+          </div>
+          <span class="d-block small fw-bold text-success text-uppercase"><i class="bi bi-check-circle-fill me-1"></i> {{ cert.verification_status }}</span>
+        </div>
+
+        <div class="col-4 text-end">
+          <div class="signature-font">Roshen D'silva</div>
+          <div class="border-top border-dark d-inline-block pt-1 px-3">
+            <span class="d-block small fw-bold text-dark">Roshen D'silva</span>
+            <span class="d-block text-muted" style="font-size: 0.75rem;">Founder & Director, ARISE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal Educational Disclaimer -->
+      <div class="mt-4 pt-3 text-muted" style="font-size: 0.7rem; border-top: 1px dashed #cbd5e1;">
+        <strong>Disclaimer:</strong> This Certificate of Completion is issued by ARISE as an educational recognition of course completion. It is not an academic degree, ecclesiastical credential, or government qualification.
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

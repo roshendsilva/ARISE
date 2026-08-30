@@ -1,66 +1,94 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% block title %}My Learning Dashboard — ARISE{% endblock %}
+{% block title %}My Learning & Certificates — ARISE{% endblock %}
 
 {% block content %}
-<div class="bg-navy-darker text-white py-5 mb-5 border-bottom border-gold-subtle">
-  <div class="container">
-    <div class="d-flex align-items-center gap-3">
-      <div class="rounded-circle bg-gold text-navy p-3 fs-3 fw-bold">
-        <i class="bi bi-person-workspace"></i>
-      </div>
-      <div>
-        <h1 class="display-5 fw-bold font-serif mb-1">{{ current_user.username }}'s Learning Dashboard</h1>
-        <p class="text-gold-light mb-0">{{ current_user.email }} — Track your Catholic formation courses and certificates.</p>
-      </div>
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+    <div>
+      <h1 class="h2 fw-bold text-gold mb-1" style="font-family: 'Cinzel', serif;">
+        <i class="bi bi-mortarboard-fill me-2"></i> My Learning & Formation Dashboard
+      </h1>
+      <p class="text-muted small mb-0">Track your enrolled courses, lesson progress, and earned certificates.</p>
     </div>
+    <a href="{{ url_for('courses') }}" class="btn btn-gold btn-sm fw-bold">
+      <i class="bi bi-plus-circle me-1"></i> Browse More Courses
+    </a>
   </div>
-</div>
 
-<div class="container mb-5">
-  <h2 class="font-serif fw-bold text-navy mb-4 border-bottom pb-2">
-    <i class="bi bi-journal-check text-gold me-2"></i> Enrolled Formation Courses
-  </h2>
-
+  {% if user_courses_data %}
   <div class="row g-4 mb-5">
-    {% for item in course_data %}
+    {% for item in user_courses_data %}
     {% set c = item.course %}
-    {% set c_prog = item.course_prog %}
     <div class="col-lg-6">
-      <div class="card card-arise h-100 shadow-sm border-0 rounded-4 p-4">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge bg-navy text-gold px-3 py-1 rounded-pill fw-semibold">{{ c.level }}</span>
-          <span class="text-gold fw-bold">{{ item.progress_pct }}% Complete</span>
+      <div class="card bg-dark text-white border-secondary shadow-lg rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="badge bg-gold text-dark font-monospace text-uppercase">{{ c.category }}</span>
+          <span class="text-gold fw-bold small">{{ item.completed_lessons }} / {{ item.total_lessons }} Lessons</span>
+        </div>
+        <h3 class="h4 fw-bold text-white mb-2" style="font-family: 'Cinzel', serif;">{{ c.title }}</h3>
+        
+        <div class="mb-3 mt-3">
+          <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>Overall Progress</span>
+            <span class="text-gold fw-bold">{{ item.percentage }}%</span>
+          </div>
+          <div class="progress" style="height: 8px; background-color: #334155;">
+            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ item.percentage }}%;"></div>
+          </div>
         </div>
 
-        <h3 class="font-serif fw-bold h4 mb-2 text-navy">
-          <a href="{{ url_for('course_detail', slug=c.slug) }}" class="text-navy text-decoration-none hover-gold">{{ c.title }}</a>
-        </h3>
-
-        <div class="progress my-3" style="height: 10px;">
-          <div class="progress-bar bg-gold" role="progressbar" style="width: {{ item.progress_pct }}%;"></div>
-        </div>
-
-        <div class="d-flex justify-content-between text-muted small mb-4">
-          <span>{{ item.completed_lessons }} of {{ item.total_lessons }} Lessons Completed</span>
-          {% if c_prog and c_prog.final_score %}
-          <span>Exam Score: <strong>{{ c_prog.final_score }}%</strong></span>
-          {% endif %}
-        </div>
-
-        <div class="d-flex gap-2 mt-auto pt-3 border-top border-light">
-          <a href="{{ url_for('course_detail', slug=c.slug) }}" class="btn btn-navy btn-sm rounded-pill px-4 flex-grow-1">
-            Go to Course
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+          {% if item.certificate %}
+          <a href="{{ url_for('view_certificate', certificate_id=item.certificate.certificate_id) }}" class="btn btn-outline-warning btn-sm fw-bold">
+            <i class="bi bi-award-fill me-1"></i> View Certificate
           </a>
-          {% if c_prog and c_prog.is_completed %}
-          <a href="{{ url_for('certificate_view', cert_id=c_prog.certificate_id) }}" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold">
-            <i class="bi bi-award-fill me-1"></i> Certificate
-          </a>
+          {% else %}
+          <span class="text-muted small"><i class="bi bi-info-circle me-1"></i> Complete all lessons for certificate</span>
           {% endif %}
+
+          <a href="{{ url_for('course_detail', slug=c.slug) }}" class="btn btn-gold btn-sm fw-bold">
+            Continue Learning <i class="bi bi-arrow-right ms-1"></i>
+          </a>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
+  {% else %}
+  <div class="text-center py-5 bg-dark rounded-4 border border-secondary p-5 mb-5">
+    <i class="bi bi-journal-album display-1 text-muted d-block mb-3"></i>
+    <h3 class="h4 text-muted">You have not enrolled in any courses yet.</h3>
+    <p class="text-slate-400 max-w-md mx-auto mb-4">Start your formation today with our scholarly 10-lesson masterclass on the Catholic Church.</p>
+    <a href="{{ url_for('courses') }}" class="btn btn-gold btn-lg fw-bold px-4">
+      Explore Courses Now
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Earned Certificates List -->
+  {% if certificates %}
+  <div class="card bg-dark text-white border-warning shadow-lg rounded-4 p-4">
+    <h3 class="h4 fw-bold text-gold mb-4" style="font-family: 'Cinzel', serif;">
+      <i class="bi bi-award-fill text-warning me-2"></i> Verified Certificates of Completion
+    </h3>
+    <div class="row g-3">
+      {% for cert in certificates %}
+      <div class="col-md-6 col-lg-4">
+        <div class="p-3 bg-slate-900 rounded-3 border border-warning d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="h6 fw-bold text-white mb-1">{{ cert.course_title }}</h5>
+            <span class="text-gold font-monospace small d-block">{{ cert.certificate_id }}</span>
+            <span class="text-muted small" style="font-size: 0.75rem;">Issued: {{ cert.issue_date.strftime('%B %d, %Y') }}</span>
+          </div>
+          <a href="{{ url_for('view_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-warning btn-sm fw-bold">
+            View
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
