@@ -1,9 +1,10 @@
 import os
+import uuid
 import markdown as md_lib
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from config import Config
-from models import db, User, Category, Article, ChurchFather, ScriptureReference, Source, ObjectionEntry, QuestionSubmission
+from models import db, User, Category, Article, ChurchFather, ScriptureReference, Source, ObjectionEntry, QuestionSubmission, Course, Lesson, LessonQuiz, CourseAssessmentQuestion, UserLessonProgress, UserCourseProgress
 from seed_data import seed_database
 from sqlalchemy import or_
 
@@ -594,9 +595,272 @@ def admin_delete_question(id):
     return redirect(url_for('admin_questions'))
 
 
+# ==========================================
+# CATHOLIC FORMATION COURSE ROUTES
+# ==========================================
+
+@app.route('/courses')
+def courses():
+    course_list = Course.query.filter_by(is_published=True).all()
+    user_progress_map = {}
+    if current_user.is_authenticated:
+        progress_entries = UserCourseProgress.query.filter_by(user_id=current_user.id).all()
+        for p in progress_entries:
+            user_progress_map[p.course_id] = p
+
+    return render_template('courses.html', courses=course_list, user_progress_map=user_progress_map)
+
+
+@app.route('/course/<slug>')
+def course_detail(slug):
+    course = Course.query.filter_by(slug=slug, is_published=True).first_or_404()
+    completed_lesson_ids = set()
+    user_course_prog = None
+    
+    if current_user.is_authenticated:
+        completed_entries = UserLessonProgress.query.filter_by(user_id=current_user.id, completed=True).all()
+        completed_lesson_ids = set(c.lesson_id for c in completed_entries)
+        user_course_prog = UserCourseProgress.query.filter_by(user_id=current_user.id, course_id=course.id).first()
+
+    total_lessons = len(course.lessons)
+    completed_count = sum(1 for l in course.lessons if l.id in completed_lesson_ids)
+    progress_pct = int((completed_count / total_lessons) * 100) if total_lessons > 0 else 0
+
+    return render_template(
+        'course_detail.html',
+        course=course,
+        completed_lesson_ids=completed_lesson_ids,
+        completed_count=completed_count,
+        total_lessons=total_lessons,
+        progress_pct=progress_pct,
+        user_course_prog=user_course_prog
+    )
+
+
+@app.route('/course/<course_slug>/lesson/<lesson_slug>')
+def lesson_view(course_slug, lesson_slug):
+    course = Course.query.filter_by(slug=course_slug, is_published=True).first_or_404()
+    lesson = Lesson.query.filter_by(slug=lesson_slug, course_id=course.id).first_or_404()
+
+    # Find previous and next lessons
+    all_lessons = course.lessons
+    current_idx = -1
+    for idx, l in enumerate(all_lessons):
+        if l.id == lesson.id:
+            current_idx = idx
+            break
+
+    prev_lesson = all_lessons[current_idx - 1] if current_idx > 0 else None
+    next_lesson = all_lessons[current_idx + 1] if current_idx < len(all_lessons) - 1 else None
+
+    # Track progress
+    is_completed = False
+    quiz_score = None
+    if current_user.is_authenticated:
+        prog = UserLessonProgress.query.filter_by(user_id=current_user.id, lesson_id=lesson.id).first()
+        if prog:
+            is_completed = prog.completed
+            quiz_score = prog.quiz_score
+
+    return render_template(
+        'lesson_view.html',
+        course=course,
+        lesson=lesson,
+        prev_lesson=prev_lesson,
+        next_lesson=next_lesson,
+        is_completed=is_completed,
+        quiz_score=quiz_score,
+        total_lessons=len(all_lessons)
+    )
+
+
+@app.route('/lesson/<int:lesson_id>/complete', methods=['POST'])
+@login_required
+def complete_lesson(lesson_id):
+    lesson = Lesson.query.get_or_404(lesson_id)
+    prog = UserLessonProgress.query.filter_by(user_id=current_user.id, lesson_id=lesson.id).first()
+    if not prog:
+        prog = UserLessonProgress(user_id=current_user.id, lesson_id=lesson.id, completed=True)
+        db.session.add(prog)
+    else:
+        prog.completed = not prog.completed # Toggle completion
+
+    db.session.commit()
+    
+    status_str = "marked as complete!" if prog.completed else "marked as incomplete."
+    flash(f"Lesson {lesson.lesson_number} {status_str}", "info")
+    return redirect(url_for('lesson_view', course_slug=lesson.course.slug, lesson_slug=lesson.slug))
+
+
+@app.route('/lesson/<int:lesson_id>/quiz', methods=['POST'])
+@login_required
+def submit_lesson_quiz(lesson_id):
+    lesson = Lesson.query.get_or_404(lesson_id)
+    quizzes = lesson.quizzes
+    if not quizzes:
+        return redirect(url_for('lesson_view', course_slug=lesson.course.slug, lesson_slug=lesson.slug))
+
+    correct_count = 0
+    total_q = len(quizzes)
+
+    for q in quizzes:
+        user_ans = request.form.get(f'quiz_q_{q.id}')
+        if user_ans and user_ans.upper() == q.correct_option.upper():
+            correct_count += 1
+
+    score_pct = int((correct_count / total_q) * 100)
+
+    prog = UserLessonProgress.query.filter_by(user_id=current_user.id, lesson_id=lesson.id).first()
+    if not prog:
+        prog = UserLessonProgress(user_id=current_user.id, lesson_id=lesson.id, completed=True, quiz_score=score_pct)
+        db.session.add(prog)
+    else:
+        prog.completed = True
+        prog.quiz_score = score_pct
+
+    db.session.commit()
+
+    flash(f"Quiz completed! You scored {score_pct}% ({correct_count}/{total_q} correct). Lesson marked complete!", "success")
+    return redirect(url_for('lesson_view', course_slug=lesson.course.slug, lesson_slug=lesson.slug))
+
+
+@app.route('/course/<slug>/final-assessment', methods=['GET', 'POST'])
+@login_required
+def final_assessment(slug):
+    course = Course.query.filter_by(slug=slug, is_published=True).first_or_404()
+    questions = course.assessment_questions
+
+    if request.method == 'POST':
+        correct_count = 0
+        total_q = len(questions)
+
+        for q in questions:
+            ans = request.form.get(f'question_{q.id}')
+            if ans and ans.upper() == q.correct_option.upper():
+                correct_count += 1
+
+        final_score = int((correct_count / total_q) * 100) if total_q > 0 else 100
+        is_passed = final_score >= course.passing_score
+
+        # Record course progress & certificate
+        c_prog = UserCourseProgress.query.filter_by(user_id=current_user.id, course_id=course.id).first()
+        if not c_prog:
+            c_prog = UserCourseProgress(
+                user_id=current_user.id,
+                course_id=course.id,
+                is_completed=is_passed,
+                final_score=final_score,
+                certificate_id=str(uuid.uuid4())[:18].upper() if is_passed else None,
+                completed_at=datetime.utcnow() if is_passed else None
+            )
+            db.session.add(c_prog)
+        else:
+            c_prog.final_score = final_score
+            if is_passed:
+                c_prog.is_completed = True
+                if not c_prog.certificate_id:
+                    c_prog.certificate_id = str(uuid.uuid4())[:18].upper()
+                c_prog.completed_at = datetime.utcnow()
+
+        db.session.commit()
+
+        if is_passed:
+            flash(f"CONGRATULATIONS! You passed the Final Assessment with a score of {final_score}%! Your Arise Certificate of Completion is now unlocked!", "success")
+            return redirect(url_for('certificate_view', cert_id=c_prog.certificate_id))
+        else:
+            flash(f"You scored {final_score}%. The required passing score is {course.passing_score}%. Please review the lessons and retake the exam.", "warning")
+
+    return render_template('final_assessment.html', course=course, questions=questions)
+
+
+@app.route('/certificate/<cert_id>')
+def certificate_view(cert_id):
+    prog = UserCourseProgress.query.filter_by(certificate_id=cert_id, is_completed=True).first_or_404()
+    return render_template('certificate.html', prog=prog, user=prog.user, course=prog.course)
+
+
+@app.route('/my-learning')
+@login_required
+def my_learning():
+    lesson_progresses = UserLessonProgress.query.filter_by(user_id=current_user.id).all()
+    completed_lesson_ids = set(p.lesson_id for p in lesson_progresses if p.completed)
+    
+    courses = Course.query.filter_by(is_published=True).all()
+    course_data = []
+
+    for c in courses:
+        total_l = len(c.lessons)
+        comp_l = sum(1 for l in c.lessons if l.id in completed_lesson_ids)
+        pct = int((comp_l / total_l) * 100) if total_l > 0 else 0
+        c_prog = UserCourseProgress.query.filter_by(user_id=current_user.id, course_id=c.id).first()
+
+        course_data.append({
+            "course": c,
+            "total_lessons": total_l,
+            "completed_lessons": comp_l,
+            "progress_pct": pct,
+            "course_prog": c_prog
+        })
+
+    return render_template('my_learning.html', course_data=course_data)
+
+
+# Admin CMS Routes for Courses
+@app.route('/admin/courses')
+@login_required
+def admin_courses():
+    courses = Course.query.all()
+    return render_template('admin/admin_courses.html', courses=courses)
+
+
+@app.route('/admin/courses/new', methods=['GET', 'POST'])
+@login_required
+def admin_course_new():
+    if request.method == 'POST':
+        title = request.form.get('title')
+        slug = request.form.get('slug')
+        description = request.form.get('description')
+        overview = request.form.get('overview')
+        level = request.form.get('level', 'Beginner / Intermediate')
+        passing_score = int(request.form.get('passing_score', 70))
+
+        course = Course(
+            title=title,
+            slug=slug,
+            description=description,
+            overview=overview,
+            level=level,
+            passing_score=passing_score,
+            is_published=True
+        )
+        db.session.add(course)
+        db.session.commit()
+        flash('Course created successfully!', 'success')
+        return redirect(url_for('admin_courses'))
+
+    return render_template('admin/admin_course_edit.html', course=None)
+
+
+@app.route('/admin/courses/<int:course_id>/edit', methods=['GET', 'POST'])
+@login_required
+def admin_course_edit(course_id):
+    course = Course.query.get_or_404(course_id)
+    if request.method == 'POST':
+        course.title = request.form.get('title')
+        course.slug = request.form.get('slug')
+        course.description = request.form.get('description')
+        course.overview = request.form.get('overview')
+        course.level = request.form.get('level')
+        course.passing_score = int(request.form.get('passing_score', 70))
+        db.session.commit()
+        flash('Course updated successfully!', 'success')
+        return redirect(url_for('admin_courses'))
+
+    return render_template('admin/admin_course_edit.html', course=course)
 
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     print(f"Starting ARISE Catholic Apologetics Platform on http://127.0.0.1:{port}")
     app.run(host='127.0.0.1', port=port, debug=True)
+

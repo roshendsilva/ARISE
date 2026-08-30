@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}My Learning Dashboard — ARISE{% endblock %}
+
+{% block content %}
+<div class="bg-navy-darker text-white py-5 mb-5 border-bottom border-gold-subtle">
+  <div class="container">
+    <div class="d-flex align-items-center gap-3">
+      <div class="rounded-circle bg-gold text-navy p-3 fs-3 fw-bold">
+        <i class="bi bi-person-workspace"></i>
+      </div>
+      <div>
+        <h1 class="display-5 fw-bold font-serif mb-1">{{ current_user.username }}'s Learning Dashboard</h1>
+        <p class="text-gold-light mb-0">{{ current_user.email }} — Track your Catholic formation courses and certificates.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <h2 class="font-serif fw-bold text-navy mb-4 border-bottom pb-2">
+    <i class="bi bi-journal-check text-gold me-2"></i> Enrolled Formation Courses
+  </h2>
+
+  <div class="row g-4 mb-5">
+    {% for item in course_data %}
+    {% set c = item.course %}
+    {% set c_prog = item.course_prog %}
+    <div class="col-lg-6">
+      <div class="card card-arise h-100 shadow-sm border-0 rounded-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge bg-navy text-gold px-3 py-1 rounded-pill fw-semibold">{{ c.level }}</span>
+          <span class="text-gold fw-bold">{{ item.progress_pct }}% Complete</span>
+        </div>
+
+        <h3 class="font-serif fw-bold h4 mb-2 text-navy">
+          <a href="{{ url_for('course_detail', slug=c.slug) }}" class="text-navy text-decoration-none hover-gold">{{ c.title }}</a>
+        </h3>
+
+        <div class="progress my-3" style="height: 10px;">
+          <div class="progress-bar bg-gold" role="progressbar" style="width: {{ item.progress_pct }}%;"></div>
+        </div>
+
+        <div class="d-flex justify-content-between text-muted small mb-4">
+          <span>{{ item.completed_lessons }} of {{ item.total_lessons }} Lessons Completed</span>
+          {% if c_prog and c_prog.final_score %}
+          <span>Exam Score: <strong>{{ c_prog.final_score }}%</strong></span>
+          {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 mt-auto pt-3 border-top border-light">
+          <a href="{{ url_for('course_detail', slug=c.slug) }}" class="btn btn-navy btn-sm rounded-pill px-4 flex-grow-1">
+            Go to Course
+          </a>
+          {% if c_prog and c_prog.is_completed %}
+          <a href="{{ url_for('certificate_view', cert_id=c_prog.certificate_id) }}" class="btn btn-gold btn-sm rounded-pill px-3 fw-bold">
+            <i class="bi bi-award-fill me-1"></i> Certificate
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

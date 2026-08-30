@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}New Course{% endif %} — Admin Portal{% endblock %}
+
+{% block content %}
+<div class="bg-navy-darker text-white py-4 mb-4">
+  <div class="container">
+    <a href="{{ url_for('admin_courses') }}" class="text-gold-light small text-decoration-none"><i class="bi bi-arrow-left me-1"></i> Back to Courses</a>
+    <h1 class="h3 font-serif fw-bold mb-0 text-white mt-1">{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %}</h1>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <div class="card card-arise border-0 shadow-sm rounded-4 p-4 max-w-3xl mx-auto">
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label fw-bold text-navy">Course Title</label>
+        <input type="text" name="title" class="form-control" value="{{ course.title if course else '' }}" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold text-navy">URL Slug</label>
+        <input type="text" name="slug" class="form-control" value="{{ course.slug if course else '' }}" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold text-navy">Course Level</label>
+        <select name="level" class="form-select">
+          <option value="Beginner / Intermediate" {% if course and course.level == 'Beginner / Intermediate' %}selected{% endif %}>Beginner / Intermediate</option>
+          <option value="Intermediate / Advanced" {% if course and course.level == 'Intermediate / Advanced' %}selected{% endif %}>Intermediate / Advanced</option>
+          <option value="Masterclass Formation" {% if course and course.level == 'Masterclass Formation' %}selected{% endif %}>Masterclass Formation</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold text-navy">Passing Score (%)</label>
+        <input type="number" name="passing_score" class="form-control" value="{{ course.passing_score if course else 70 }}" min="50" max="100" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold text-navy">Short Description</label>
+        <textarea name="description" class="form-control" rows="3" required>{{ course.description if course else '' }}</textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold text-navy">Detailed Course Overview (Markdown Supported)</label>
+        <textarea name="overview" class="form-control" rows="8">{{ course.overview if course else '' }}</textarea>
+      </div>
+
+      <button type="submit" class="btn btn-gold fw-bold px-4 py-2 rounded-pill">
+        {% if course %}Save Course Changes{% else %}Create Course{% endif %}
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

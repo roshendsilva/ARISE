@@ -164,3 +164,111 @@ class QuestionSubmission(db.Model):
     def __repr__(self):
         return f'<QuestionSubmission {self.question_title[:30]}>'
 
+
+class Course(db.Model):
+    __tablename__ = 'courses'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), nullable=False, unique=True)
+    description = db.Column(db.Text, nullable=False)
+    overview = db.Column(db.Text, nullable=True)
+    level = db.Column(db.String(50), default='Beginner / Intermediate') # Beginner, Intermediate, Advanced
+    is_published = db.Column(db.Boolean, default=True)
+    passing_score = db.Column(db.Integer, default=70)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    lessons = db.relationship('Lesson', backref='course', lazy=True, cascade="all, delete-orphan", order_by="Lesson.lesson_number")
+    assessment_questions = db.relationship('CourseAssessmentQuestion', backref='course', lazy=True, cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f'<Course {self.title}>'
+
+
+class Lesson(db.Model):
+    __tablename__ = 'lessons'
+
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    module_number = db.Column(db.Integer, default=1)
+    lesson_number = db.Column(db.Integer, nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), nullable=False, unique=True)
+    estimated_time = db.Column(db.String(50), default='45 mins')
+    learning_objectives = db.Column(db.Text, nullable=True)
+    content = db.Column(db.Text, nullable=False) # 4,000+ words long-form educational article
+    key_points = db.Column(db.Text, nullable=True)
+    reflection_questions = db.Column(db.Text, nullable=True)
+    primary_sources = db.Column(db.Text, nullable=True)
+    secondary_sources = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    quizzes = db.relationship('LessonQuiz', backref='lesson', lazy=True, cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f'<Lesson {self.lesson_number}: {self.title}>'
+
+
+class LessonQuiz(db.Model):
+    __tablename__ = 'lesson_quizzes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lessons.id'), nullable=False)
+    question = db.Column(db.Text, nullable=False)
+    option_a = db.Column(db.String(255), nullable=False)
+    option_b = db.Column(db.String(255), nullable=False)
+    option_c = db.Column(db.String(255), nullable=False)
+    option_d = db.Column(db.String(255), nullable=False)
+    correct_option = db.Column(db.String(1), nullable=False) # 'A', 'B', 'C', or 'D'
+    explanation = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<LessonQuiz {self.id}>'
+
+
+class CourseAssessmentQuestion(db.Model):
+    __tablename__ = 'course_assessment_questions'
+
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    question = db.Column(db.Text, nullable=False)
+    option_a = db.Column(db.String(255), nullable=False)
+    option_b = db.Column(db.String(255), nullable=False)
+    option_c = db.Column(db.String(255), nullable=False)
+    option_d = db.Column(db.String(255), nullable=False)
+    correct_option = db.Column(db.String(1), nullable=False)
+    explanation = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<CourseAssessmentQuestion {self.id}>'
+
+
+class UserLessonProgress(db.Model):
+    __tablename__ = 'user_lesson_progress'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    lesson_id = db.Column(db.Integer, db.ForeignKey('lessons.id'), nullable=False)
+    completed = db.Column(db.Boolean, default=False)
+    quiz_score = db.Column(db.Integer, nullable=True)
+    completed_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='lesson_progress', lazy=True)
+    lesson = db.relationship('Lesson', backref='user_progress', lazy=True)
+
+
+class UserCourseProgress(db.Model):
+    __tablename__ = 'user_course_progress'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False)
+    is_completed = db.Column(db.Boolean, default=False)
+    final_score = db.Column(db.Integer, nullable=True)
+    certificate_id = db.Column(db.String(64), unique=True, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
+    user = db.relationship('User', backref='course_progress', lazy=True)
+    course = db.relationship('Course', backref='user_progress', lazy=True)
+
+
