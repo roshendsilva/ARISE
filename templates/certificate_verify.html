@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate Verification | ARISE Academy{% endblock %}
+
+{% block content %}
+<div class="bg-navy text-white py-5 shadow-sm border-bottom border-gold-subtle">
+    <div class="container text-center">
+        <span class="badge bg-gold text-dark uppercase fw-bold mb-2"><i class="bi bi-shield-check me-1"></i> Public Registry</span>
+        <h1 class="display-5 font-serif fw-bold text-gold-gradient mb-2">Certificate Verification</h1>
+        <p class="lead text-light max-w-75 mx-auto">Verify the authenticity of educational certificates issued by ARISE Catholic Apologetics Academy.</p>
+
+        <!-- Search Bar -->
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-6">
+                <form method="GET" action="{{ url_for('verify_certificate', certificate_id='') }}" onsubmit="this.action='/certificate/verify/' + document.getElementById('certIdInput').value;" class="input-group input-group-lg">
+                    <input type="text" id="certIdInput" class="form-control bg-dark-navy text-white border-gold" placeholder="Enter Certificate ID (e.g. ARISE-2026-X8F9A)" value="{{ queried_id }}" required>
+                    <button type="submit" class="btn btn-gold fw-bold px-4">Verify</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            {% if cert %}
+            <!-- VALID CERTIFICATE BADGE -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-lg-5 bg-white border-top-success text-center">
+                <div class="badge bg-success text-white px-4 py-2 fs-6 rounded-pill mx-auto mb-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill fs-5"></i> VALID CERTIFICATE
+                </div>
+
+                <h3 class="font-serif fw-bold text-navy mb-1">{{ cert.student_name }}</h3>
+                <p class="text-muted small mb-4">Successfully completed the ARISE Academy course</p>
+
+                <div class="p-4 bg-light rounded-3 border mb-4">
+                    <h4 class="font-serif fw-bold text-gold-gradient mb-2">{{ cert.course_title }}</h4>
+                    <div class="row g-3 text-secondary small mt-2">
+                        <div class="col-md-6">
+                            <strong class="text-navy">Certificate ID:</strong> {{ cert.certificate_id }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-navy">Completion Date:</strong> {{ cert.completion_date.strftime('%B %d, %Y') }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-navy">Issuing Body:</strong> ARISE Catholic Apologetics
+                        </div>
+                        <div class="col-md-6">
+                            <strong class="text-navy">Instructor:</strong> {{ cert.instructor_signature }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer Box -->
+                <div class="p-3 bg-white rounded border text-muted extra-small">
+                    <i class="bi bi-info-circle-fill text-gold me-1"></i>
+                    {{ cert.disclaimer }}
+                </div>
+            </div>
+
+            {% elif queried_id %}
+            <!-- INVALID CERTIFICATE BADGE -->
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-lg-5 bg-white border-top-danger text-center">
+                <div class="badge bg-danger text-white px-4 py-2 fs-6 rounded-pill mx-auto mb-3 d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-x-circle-fill fs-5"></i> INVALID / UNRECOGNIZED CERTIFICATE
+                </div>
+
+                <h4 class="font-serif fw-bold text-navy mb-2">No Record Found for "{{ queried_id }}"</h4>
+                <p class="text-secondary small max-w-75 mx-auto">
+                    The requested Certificate ID could not be verified in our public registry. Please check the ID string for typos or contact ARISE Support.
+                </p>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-patch-check fs-1 text-gold"></i>
+                <p class="mt-2">Enter a Certificate ID in the search box above to verify its authenticity.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

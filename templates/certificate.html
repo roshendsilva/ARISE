@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Certificate of Completion - {{ cert.student_name }} | ARISE{% endblock %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container text-center mb-4 d-print-none">
+        <h2 class="font-serif fw-bold text-navy">🎉 Congratulations, {{ cert.student_name }}!</h2>
+        <p class="text-secondary small">You have successfully completed the course and earned your official ARISE Certificate of Completion.</p>
+        
+        <div class="d-flex justify-content-center gap-3">
+            <button onclick="window.print()" class="btn btn-navy text-white fw-bold">
+                <i class="bi bi-printer-fill me-2"></i> Print / Download PDF
+            </button>
+            <a href="{{ url_for('verify_certificate', certificate_id=cert.certificate_id) }}" class="btn btn-outline-gold text-dark fw-bold">
+                <i class="bi bi-patch-check-fill text-gold me-2"></i> Verify Public URL
+            </a>
+        </div>
+    </div>
+
+    <!-- CERTIFICATE PRINT AREA -->
+    <div class="container d-flex justify-content-center">
+        <div class="certificate-frame bg-white p-5 shadow-lg border border-gold position-relative rounded max-w-900px w-100">
+            <div class="certificate-inner-border border border-gold-subtle p-5 text-center position-relative">
+                <!-- Watermark Logo -->
+                <div class="watermark-seal opacity-10 position-absolute top-50 start-50 translate-middle pointer-events-none">
+                    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="Seal" class="w-200px">
+                </div>
+
+                <!-- Header -->
+                <div class="mb-4">
+                    <img src="{{ url_for('static', filename='images/logo.jpg') }}" alt="ARISE Logo" class="h-60px mb-2">
+                    <h1 class="display-6 font-serif fw-bold text-navy letter-spacing-2 uppercase mb-0">ARISE</h1>
+                    <p class="text-gold uppercase fw-semibold small letter-spacing-3 mb-0">Catholic Apologetics & Formation</p>
+                </div>
+
+                <div class="my-4">
+                    <span class="badge bg-gold text-dark uppercase letter-spacing-2 px-3 py-2 fw-bold fs-6">Certificate of Completion</span>
+                </div>
+
+                <p class="text-muted font-serif fst-italic fs-5 mb-2">This certificate is proudly presented to</p>
+                <h2 class="display-5 font-serif fw-bold text-navy border-bottom border-gold-subtle pb-2 d-inline-block px-5 mb-4">
+                    {{ cert.student_name }}
+                </h2>
+
+                <p class="text-secondary fs-5 mb-2">for successfully completing the structured theological course</p>
+                <h3 class="display-6 font-serif fw-bold text-gold-gradient mb-4">
+                    {{ cert.course_title }}
+                </h3>
+
+                <!-- Certificate Metadata Row -->
+                <div class="row mt-5 pt-4 border-top border-light text-start align-items-end">
+                    <div class="col-4">
+                        <div class="small text-muted mb-1">Certificate ID</div>
+                        <div class="fw-mono fw-bold text-navy fs-6">{{ cert.certificate_id }}</div>
+                        <div class="small text-muted mt-2">Date of Issue</div>
+                        <div class="fw-semibold text-dark">{{ cert.completion_date.strftime('%B %d, %Y') }}</div>
+                    </div>
+
+                    <div class="col-4 text-center">
+                        <div class="badge bg-navy text-gold p-3 rounded-circle fs-3 mx-auto shadow-sm">
+                            <i class="bi bi-award-fill"></i>
+                        </div>
+                        <div class="uppercase small fw-bold text-navy mt-1">ARISE ACADEMY</div>
+                    </div>
+
+                    <div class="col-4 text-end">
+                        <div class="font-serif fst-italic fw-bold text-navy fs-5 border-bottom pb-1 mb-1">
+                            Roshen D'silva
+                        </div>
+                        <div class="small text-muted">Course Instructor / Founder</div>
+                        <div class="small text-muted">ARISE Apologetics Vault</div>
+                    </div>
+                </div>
+
+                <!-- Mandatory Disclaimer -->
+                <div class="mt-5 pt-3 border-top text-center">
+                    <p class="text-muted fst-italic extra-small mb-0 max-w-75 mx-auto">
+                        {{ cert.disclaimer }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .certificate-frame, .certificate-frame * {
+        visibility: visible;
+    }
+    .certificate-frame {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        box-shadow: none !important;
+    }
+    .d-print-none {
+        display: none !important;
+    }
+}
+</style>
+{% endblock %}

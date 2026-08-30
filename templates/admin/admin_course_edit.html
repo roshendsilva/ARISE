@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{% if course %}Edit Course: {{ course.title }}{% else %}Create New Course{% endif %} | ARISE Admin{% endblock %}
+
+{% block content %}
+<div class="bg-navy text-white py-4 shadow-sm border-bottom border-gold-subtle mb-4">
+    <div class="container">
+        <h1 class="display-6 font-serif fw-bold text-gold-gradient mb-0">
+            {% if course %}<i class="bi bi-pencil-square me-2"></i>Edit Course{% else %}<i class="bi bi-plus-circle-fill me-2"></i>Create New Course{% endif %}
+        </h1>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-lg-5 bg-white border-top-gold">
+                <form method="POST" action="{% if course %}{{ url_for('admin_course_edit', id=course.id) }}{% else %}{{ url_for('admin_course_new') }}{% endif %}">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold text-navy">Course Title</label>
+                            <input type="text" name="title" value="{{ course.title if course else '' }}" class="form-control" placeholder="e.g. Understanding the Catholic Church" required>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold text-navy">URL Slug</label>
+                            <input type="text" name="slug" value="{{ course.slug if course else '' }}" class="form-control" placeholder="understanding-the-catholic-church">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-navy">Category</label>
+                            <input type="text" name="category_name" value="{{ course.category_name if course else 'Catholic Apologetics' }}" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Difficulty Level</label>
+                            <select name="difficulty" class="form-select">
+                                <option value="Beginner" {% if course and course.difficulty == 'Beginner' %}selected{% endif %}>Beginner</option>
+                                <option value="Intermediate" {% if course and course.difficulty == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                                <option value="Advanced" {% if course and course.difficulty == 'Advanced' %}selected{% endif %}>Advanced</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Status</label>
+                            <select name="status" class="form-select">
+                                <option value="Published" {% if course and course.status == 'Published' %}selected{% endif %}>Published</option>
+                                <option value="Draft" {% if course and course.status == 'Draft' %}selected{% endif %}>Draft</option>
+                                <option value="Archived" {% if course and course.status == 'Archived' %}selected{% endif %}>Archived</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-navy">Instructor Name</label>
+                            <input type="text" name="instructor_name" value="{{ course.instructor_name if course else 'ARISE Theological Faculty' }}" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Estimated Duration</label>
+                            <input type="text" name="estimated_completion_time" value="{{ course.estimated_completion_time if course else '3 Hours' }}" class="form-control" placeholder="e.g. 3 Hours" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold text-navy">Thumbnail Icon (Bootstrap Icon)</label>
+                            <input type="text" name="thumbnail_icon" value="{{ course.thumbnail_icon if course else 'bi-bank' }}" class="form-control" placeholder="bi-bank">
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-navy">Short Description (Cards view)</label>
+                            <textarea name="short_description" class="form-control" rows="2" required>{{ course.short_description if course else '' }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-navy">Full Description (Course Header)</label>
+                            <textarea name="full_description" class="form-control" rows="4" required>{{ course.full_description if course else '' }}</textarea>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-navy">Learning Objectives (One objective per line)</label>
+                            <textarea name="learning_objectives" class="form-control" rows="4" placeholder="Explain why Jesus established a visible Church&#10;Master the Four Marks of the Church&#10;Defend Apostolic Succession">{{ course.learning_objectives if course else '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a href="{{ url_for('admin_courses') }}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-gold fw-bold px-4">
+                            {% if course %}Save Changes{% else %}Create Course{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

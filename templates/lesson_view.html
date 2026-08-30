@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} | {{ course.title }}{% endblock %}
+
+{% block content %}
+<!-- Top Header & Breadcrumbs Bar -->
+<div class="bg-navy text-white py-3 border-bottom border-gold-subtle shadow-sm sticky-top top-56 z-index-1020">
+    <div class="container-fluid px-lg-5">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{{ url_for('courses') }}" class="text-gold text-decoration-none">Courses</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('course_detail', slug=course.slug) }}" class="text-gold text-decoration-none">{{ course.title }}</a></li>
+                    <li class="breadcrumb-item active text-light" aria-current="page">Lesson {{ lesson.lesson_number }}</li>
+                </ol>
+            </nav>
+
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge bg-gold text-dark small"><i class="bi bi-clock me-1"></i>{{ lesson.estimated_reading_time }}</span>
+                {% if is_completed %}
+                <span class="badge bg-success text-white small"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+                {% else %}
+                <span class="badge bg-secondary text-white small"><i class="bi bi-circle me-1"></i>In Progress</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-lg-5 py-4">
+    <div class="row g-4">
+        <!-- Sidebar Navigation (Curriculum Accordion) -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="card border-0 shadow-sm rounded-3 sticky-top top-120 overflow-hidden">
+                <div class="card-header bg-navy text-white py-3">
+                    <h6 class="font-serif fw-bold text-gold mb-0"><i class="bi bi-layers me-2"></i>Course Curriculum</h6>
+                </div>
+                <div class="card-body p-0 max-h-80vh overflow-auto">
+                    <div class="accordion accordion-flush" id="sidebarCurriculum">
+                        {% for module in course.modules %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="sideModHead{{ module.id }}">
+                                <button class="accordion-button bg-light small fw-bold text-navy py-2 {% if module.id != lesson.module_id %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#sideModCollapse{{ module.id }}">
+                                    Mod {{ module.order }}: {{ module.title }}
+                                </button>
+                            </h2>
+                            <div id="sideModCollapse{{ module.id }}" class="accordion-collapse collapse {% if module.id == lesson.module_id %}show{% endif %}">
+                                <div class="list-group list-group-flush">
+                                    {% for les in module.lessons %}
+                                    <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=les.slug) }}" class="list-group-item list-group-item-action small py-2 px-3 d-flex align-items-center gap-2 {% if les.id == lesson.id %}bg-gold-subtle fw-bold text-navy border-start border-3 border-gold{% endif %}">
+                                        {% if les.id == lesson.id %}
+                                            <i class="bi bi-book-half text-gold"></i>
+                                        {% else %}
+                                            <i class="bi bi-circle text-muted"></i>
+                                        {% endif %}
+                                        <span class="text-truncate">{{ les.lesson_number }}. {{ les.title }}</span>
+                                    </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Lesson Content Area -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-3 p-4 p-lg-5 bg-white border-top-gold">
+                <!-- Lesson Header -->
+                <div class="border-bottom pb-4 mb-4">
+                    <span class="text-gold uppercase fw-bold small">Module: {{ lesson.module.title }}</span>
+                    <h1 class="display-6 font-serif fw-bold text-navy mt-1 mb-2">{{ lesson.lesson_number }}. {{ lesson.title }}</h1>
+                </div>
+
+                <!-- Main Content (Markdown formatted) -->
+                <div class="article-body font-sans text-secondary lh-lg mb-5 fs-5">
+                    {{ lesson.main_content|render_md|safe }}
+                </div>
+
+                <!-- Apologetics Structured Sections (Optional 7-Part Schema) -->
+                {% if lesson.catholic_claim or lesson.biblical_evidence or lesson.historical_evidence or lesson.catholic_teaching or lesson.common_objection or lesson.catholic_response %}
+                <div class="my-5 p-4 bg-light rounded-3 border border-gold-subtle">
+                    <h3 class="font-serif fw-bold text-navy mb-4"><i class="bi bi-shield-lock-fill text-gold me-2"></i>Apologetic & Theological Breakdown</h3>
+
+                    {% if lesson.catholic_claim %}
+                    <div class="mb-4 p-3 bg-white border-start border-4 border-gold rounded shadow-xs">
+                        <h5 class="fw-bold text-navy mb-1"><i class="bi bi-bookmark-check-fill text-gold me-2"></i>The Catholic Claim</h5>
+                        <p class="text-secondary small mb-0">{{ lesson.catholic_claim }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if lesson.biblical_evidence %}
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-navy mb-2"><i class="bi bi-book text-gold me-2"></i>Biblical Evidence</h5>
+                        <div class="p-3 bg-white rounded border text-secondary small">
+                            {{ lesson.biblical_evidence|render_md|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if lesson.historical_evidence %}
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-navy mb-2"><i class="bi bi-hourglass-split text-gold me-2"></i>Historical & Patristic Witness</h5>
+                        <div class="p-3 bg-white rounded border text-secondary small">
+                            {{ lesson.historical_evidence|render_md|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if lesson.catholic_teaching %}
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-navy mb-2"><i class="bi bi-bank text-gold me-2"></i>Magisterial Teaching & Catechism</h5>
+                        <div class="p-3 bg-white rounded border text-secondary small">
+                            {{ lesson.catholic_teaching|render_md|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if lesson.common_objection %}
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-danger mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Common Objection</h5>
+                        <div class="p-3 bg-white rounded border-start border-4 border-danger text-secondary small">
+                            {{ lesson.common_objection }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if lesson.catholic_response %}
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-success mb-2"><i class="bi bi-check-circle-fill me-2"></i>Catholic Apologetic Response</h5>
+                        <div class="p-3 bg-white rounded border-start border-4 border-success text-secondary small">
+                            {{ lesson.catholic_response|render_md|safe }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Sources & References -->
+                {% if lesson.sources %}
+                <div class="my-4 p-4 bg-white rounded border">
+                    <h5 class="font-serif fw-bold text-navy mb-3"><i class="bi bi-journal-text text-gold me-2"></i>Citations & References</h5>
+                    <div class="row g-2">
+                        {% for src in lesson.sources %}
+                        <div class="col-md-6">
+                            <div class="p-2 bg-light rounded border text-secondary small">
+                                <strong class="text-navy">{{ src.title }}</strong>
+                                {% if src.author %}<span class="text-muted"> — {{ src.author }}</span>{% endif %}
+                                <div class="text-muted small">{{ src.work_document }} ({{ src.section_ref }})</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Interactive Lesson Quiz System -->
+                {% if lesson.quizzes %}
+                {% set quiz = lesson.quizzes[0] %}
+                <div class="my-5 p-4 bg-navy text-white rounded-3 shadow-sm border border-gold" id="quizSection">
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom border-gold-subtle pb-3">
+                        <div>
+                            <span class="badge bg-gold text-dark uppercase small fw-bold">Interactive Evaluation</span>
+                            <h4 class="font-serif fw-bold text-gold-gradient mb-0 mt-1"><i class="bi bi-question-square-fill me-2"></i>Lesson Quiz</h4>
+                        </div>
+                        <span class="badge bg-outline-light text-white">Passing Score: {{ quiz.passing_percentage }}%</span>
+                    </div>
+
+                    <form id="quizForm" method="POST" action="{{ url_for('quiz_submit', course_slug=course.slug, lesson_slug=lesson.slug) }}">
+                        {% for question in quiz.questions %}
+                        <div class="mb-4 p-3 bg-dark-navy rounded border border-secondary question-block" data-question-id="{{ question.id }}">
+                            <h6 class="fw-bold text-gold mb-3">{{ loop.index }}. {{ question.question_text }}</h6>
+                            <div class="options-container">
+                                {% for option in question.options %}
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="opt_{{ option.id }}" value="{{ option.id }}" required>
+                                    <label class="form-check-input-label text-light small cursor-pointer" for="opt_{{ option.id }}">
+                                        {{ option.option_text }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="explanation-box mt-2 p-2 rounded bg-navy small text-info d-none"></div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4">
+                            <button type="submit" class="btn btn-gold fw-bold px-4 py-2" id="submitQuizBtn">
+                                <i class="bi bi-check2-circle me-1"></i> Submit Quiz Answers
+                            </button>
+                            <div id="quizResultAlert" class="mb-0 small fw-bold d-none"></div>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
+
+                <!-- Bottom Navigation & Mark Complete Actions -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 pt-4 border-top">
+                    <div>
+                        {% if prev_lesson %}
+                        <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=prev_lesson.slug) }}" class="btn btn-outline-navy btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i> Previous Lesson
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if current_user.is_authenticated %}
+                        <form method="POST" action="{{ url_for('mark_lesson_complete', course_slug=course.slug, lesson_slug=lesson.slug) }}" class="d-inline">
+                            <button type="submit" class="btn {% if is_completed %}btn-success{% else %}btn-gold{% endif %} fw-bold shadow-sm">
+                                {% if is_completed %}
+                                    <i class="bi bi-check-circle-fill me-1"></i> Lesson Completed
+                                {% else %}
+                                    <i class="bi bi-check2 me-1"></i> Mark as Complete & Next
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-gold fw-bold">Sign In to Save Progress</a>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if next_lesson %}
+                        <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=next_lesson.slug) }}" class="btn btn-outline-navy btn-sm">
+                            Next Lesson <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                        {% elif course.final_assessments %}
+                        <a href="{{ url_for('take_final_assessment', course_slug=course.slug) }}" class="btn btn-warning text-dark fw-bold btn-sm">
+                            Final Assessment <i class="bi bi-award-fill ms-1"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quizForm = document.getElementById('quizForm');
+    if (!quizForm) return;
+
+    quizForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitQuizBtn');
+        const alertBox = document.getElementById('quizResultAlert');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Evaluating...';
+
+        const formData = new FormData(quizForm);
+
+        fetch(quizForm.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise me-1"></i> Retry Quiz';
+            alertBox.classList.remove('d-none', 'text-success', 'text-warning');
+
+            if (data.passed) {
+                alertBox.classList.add('text-success');
+                alertBox.innerHTML = `🎉 Quiz Passed! Score: ${data.score}% (${data.passing_percentage}% required)`;
+            } else {
+                alertBox.classList.add('text-warning');
+                alertBox.innerHTML = `⚠️ Score: ${data.score}%. Need ${data.passing_percentage}% to pass. Please review explanations and retry!`;
+            }
+
+            // Highlight feedback
+            if (data.feedback) {
+                Object.keys(data.feedback).forEach(qId => {
+                    const info = data.feedback[qId];
+                    const qBlock = document.querySelector(`.question-block[data-question-id="${qId}"]`);
+                    if (qBlock) {
+                        const expBox = qBlock.querySelector('.explanation-box');
+                        if (expBox && info.explanation) {
+                            expBox.classList.remove('d-none');
+                            expBox.innerHTML = `<strong>Explanation:</strong> ${info.explanation}`;
+                        }
+                    }
+                });
+            }
+        })
+        .catch(err => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Submit Quiz Answers';
+            alert('Error evaluating quiz. Please check network connection.');
+        });
+    });
+});
+</script>
+{% endblock %}

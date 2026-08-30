@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}{{ course.title }} | ARISE Academy Course{% endblock %}
+
+{% block content %}
+<!-- Course Detail Header -->
+<div class="bg-navy text-white py-5 shadow-sm border-bottom border-gold-subtle">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('courses') }}" class="text-gold text-decoration-none">Courses</a></li>
+                <li class="breadcrumb-item active text-light" aria-current="page">{{ course.title }}</li>
+            </ol>
+        </nav>
+
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-gold text-dark uppercase fw-bold">{{ course.category_name }}</span>
+                    <span class="badge bg-outline-light text-white border small">{{ course.difficulty }}</span>
+                </div>
+                <h1 class="display-5 font-serif fw-bold text-gold-gradient mb-3">{{ course.title }}</h1>
+                <p class="lead text-light mb-4">{{ course.full_description }}</p>
+
+                <!-- Instructor & Meta -->
+                <div class="d-flex flex-wrap gap-4 text-muted small align-items-center">
+                    <div>
+                        <i class="bi bi-person-fill text-gold me-1"></i> Instructor: <strong class="text-white">{{ course.instructor_name }}</strong>
+                    </div>
+                    <div>
+                        <i class="bi bi-clock-history text-gold me-1"></i> Duration: <strong class="text-white">{{ course.estimated_completion_time }}</strong>
+                    </div>
+                    <div>
+                        <i class="bi bi-journal-text text-gold me-1"></i> Total Lessons: <strong class="text-white">{{ total_lessons }}</strong>
+                    </div>
+                    <div>
+                        <i class="bi bi-layers text-gold me-1"></i> Modules: <strong class="text-white">{{ course.modules|length }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course CTA Card -->
+            <div class="col-lg-4">
+                <div class="card card-body bg-dark-navy border-gold shadow p-4 rounded-3 text-center">
+                    <div class="bg-gold-subtle text-gold p-4 rounded-circle mx-auto mb-3 fs-1 w-80px h-80px d-flex align-items-center justify-content-center">
+                        <i class="bi {{ course.thumbnail_icon }}"></i>
+                    </div>
+
+                    {% if user_course_progress %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between text-muted small mb-1">
+                            <span>Your Progress</span>
+                            <span class="fw-bold text-gold">{{ user_course_progress.progress_percentage }}%</span>
+                        </div>
+                        <div class="progress h-8 mb-2">
+                            <div class="progress-bar bg-gold" role="progressbar" style="width: {{ user_course_progress.progress_percentage }}%;"></div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if first_uncompleted_lesson %}
+                    <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=first_uncompleted_lesson.slug) }}" class="btn btn-gold w-100 fw-bold py-3 text-uppercase letter-spacing-1 shadow-sm">
+                        {% if user_course_progress and user_course_progress.progress_percentage > 0 %}
+                            <i class="bi bi-play-circle-fill me-2"></i> Continue Course
+                        {% else %}
+                            <i class="bi bi-journal-check me-2"></i> Start Course Now
+                        {% endif %}
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('courses') }}" class="btn btn-gold w-100 fw-bold py-3 text-uppercase">
+                        <i class="bi bi-check-circle-fill me-2"></i> Course Completed
+                    </a>
+                    {% endif %}
+
+                    {% if user_course_progress and user_course_progress.completed %}
+                    <a href="{{ url_for('view_certificate', course_slug=course.slug) }}" class="btn btn-outline-warning text-gold w-100 fw-bold mt-2 py-2">
+                        <i class="bi bi-patch-check-fill me-2"></i> View Certificate
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <!-- Learning Objectives -->
+            {% if course.learning_objectives %}
+            <div class="card card-body border-0 shadow-sm rounded-3 p-4 mb-5 border-top-gold">
+                <h4 class="font-serif fw-bold text-navy mb-3"><i class="bi bi-bullseye text-gold me-2"></i>What You Will Learn</h4>
+                <div class="row g-3">
+                    {% for obj in course.learning_objectives.split('\n') %}
+                    {% if obj.strip() %}
+                    <div class="col-md-6">
+                        <div class="d-flex align-items-start gap-2">
+                            <i class="bi bi-check-circle-fill text-gold mt-1"></i>
+                            <span class="text-secondary small">{{ obj.strip() }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Course Curriculum Accordion -->
+            <div class="mb-5">
+                <h3 class="font-serif fw-bold text-navy mb-3"><i class="bi bi-journal-bookmark-fill text-gold me-2"></i>Course Curriculum</h3>
+
+                <div class="accordion shadow-sm rounded-3 overflow-hidden" id="curriculumAccordion">
+                    {% for module in course.modules %}
+                    <div class="accordion-item border-0 border-bottom">
+                        <h2 class="accordion-header" id="headingMod{{ module.id }}">
+                            <button class="accordion-button bg-light font-serif fw-bold text-navy {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMod{{ module.id }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapseMod{{ module.id }}">
+                                <div>
+                                    <span class="text-gold uppercase small me-2">Module {{ module.order }}</span>
+                                    <span>{{ module.title }}</span>
+                                    <span class="badge bg-secondary text-white small ms-2">{{ module.lessons|length }} Lessons</span>
+                                </div>
+                            </button>
+                        </h2>
+                        <div id="collapseMod{{ module.id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" aria-labelledby="headingMod{{ module.id }}" data-bs-parent="#curriculumAccordion">
+                            <div class="accordion-body p-0">
+                                {% if module.description %}
+                                <p class="text-muted small p-3 mb-0 bg-white border-bottom border-light">{{ module.description }}</p>
+                                {% endif %}
+
+                                <ul class="list-group list-group-flush">
+                                    {% for lesson in module.lessons %}
+                                    <li class="list-group-item p-3 d-flex justify-content-between align-items-center hover-light">
+                                        <div class="d-flex align-items-center gap-3">
+                                            {% if lesson.id in completed_lesson_ids %}
+                                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                            {% else %}
+                                                <i class="bi bi-circle text-muted fs-5"></i>
+                                            {% endif %}
+
+                                            <div>
+                                                <span class="text-muted small me-2">Lesson {{ lesson.lesson_number }}</span>
+                                                <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=lesson.slug) }}" class="text-navy fw-semibold text-decoration-none hover-gold">
+                                                    {{ lesson.title }}
+                                                </a>
+                                                {% if lesson.quizzes %}
+                                                <span class="badge bg-info text-dark ms-2 small">Quiz</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-3">
+                                            <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ lesson.estimated_reading_time }}</span>
+                                            <a href="{{ url_for('lesson_view', course_slug=course.slug, lesson_slug=lesson.slug) }}" class="btn btn-outline-navy btn-sm">
+                                                Read
+                                            </a>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Final Assessment Banner -->
+            {% if course.final_assessments %}
+            <div class="card card-body bg-navy text-white rounded-3 p-4 shadow-sm border-gold">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <span class="badge bg-gold text-dark uppercase fw-bold mb-1">Final Assessment</span>
+                        <h4 class="font-serif fw-bold text-gold-gradient mb-1">Ready for the Course Exam?</h4>
+                        <p class="text-light small mb-0">Score 70% or higher to earn your official Certificate of Completion.</p>
+                    </div>
+                    <a href="{{ url_for('take_final_assessment', course_slug=course.slug) }}" class="btn btn-gold fw-bold px-4 py-2">
+                        <i class="bi bi-pencil-square me-1"></i> Take Assessment
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card card-body border-0 shadow-sm rounded-3 p-4 sticky-top top-100">
+                <h5 class="font-serif fw-bold text-navy mb-3"><i class="bi bi-shield-check text-gold me-2"></i>About ARISE Formation</h5>
+                <p class="text-secondary small">
+                    ARISE courses provide faithful Catholic formation grounded in Sacred Scripture, 2,000 years of Sacred Tradition, and the authoritative Magisterium.
+                </p>
+                <hr class="my-3">
+                <div class="small text-muted">
+                    <div class="mb-2"><i class="bi bi-check2 text-gold me-2"></i>Self-paced online reading</div>
+                    <div class="mb-2"><i class="bi bi-check2 text-gold me-2"></i>Interactive lesson quizzes</div>
+                    <div class="mb-2"><i class="bi bi-check2 text-gold me-2"></i>Verified certificate of completion</div>
+                    <div><i class="bi bi-check2 text-gold me-2"></i>100% Free educational resource</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
