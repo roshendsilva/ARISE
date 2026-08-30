@@ -67,7 +67,7 @@ def seed_courses_data(app):
         # ==============================================================================
         modules_data = [
             {
-                "title": "Module 1: Christ and His Church",
+                "title": "Christ and His Church",
                 "description": "Examine the foundational identity, biblical typology, and divine institution of the Church established by Jesus Christ in the New Testament.",
                 "order": 1,
                 "lessons": [
@@ -370,7 +370,7 @@ def seed_courses_data(app):
                 ]
             },
             {
-                "title": "Module 2: Authority and Apostolic Succession",
+                "title": "Authority and Apostolic Succession",
                 "description": "Understand the Three-Fold Pillar of Truth: Sacred Scripture, Sacred Tradition, and the Magisterium, and defend Apostolic Succession and Petrine Primacy.",
                 "order": 2,
                 "lessons": [
@@ -564,7 +564,7 @@ def seed_courses_data(app):
                 ]
             },
             {
-                "title": "Module 3: The Faith of the Early Church",
+                "title": "The Faith of the Early Church",
                 "description": "Discover patristic evidence proving that 1st-century Christians were Catholic in faith, liturgy, sacraments, and practice.",
                 "order": 3,
                 "lessons": [
@@ -711,7 +711,7 @@ def seed_courses_data(app):
                 ]
             },
             {
-                "title": "Module 4: Conclusion",
+                "title": "Conclusion",
                 "description": "Reflect on the fullness of truth found in Christ's Catholic Church.",
                 "order": 4,
                 "lessons": [

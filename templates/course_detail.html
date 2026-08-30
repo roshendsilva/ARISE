@@ -115,8 +115,8 @@
                         <h2 class="accordion-header" id="headingMod{{ module.id }}">
                             <button class="accordion-button bg-light font-serif fw-bold text-navy {% if not loop.first %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMod{{ module.id }}" aria-expanded="{% if loop.first %}true{% else %}false{% endif %}" aria-controls="collapseMod{{ module.id }}">
                                 <div>
-                                    <span class="text-gold uppercase small me-2">Module {{ module.order }}</span>
-                                    <span>{{ module.title }}</span>
+                                    <span class="text-gold uppercase small me-2">Module {{ module.order }}:</span>
+                                    <span>{% if module.title.startswith('Module') %}{{ module.title.split(':', 1)[-1].strip() }}{% else %}{{ module.title }}{% endif %}</span>
                                     <span class="badge bg-secondary text-white small ms-2">{{ module.lessons|length }} Lessons</span>
                                 </div>
                             </button>
