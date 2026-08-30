@@ -51,14 +51,17 @@ def seed_courses_data(app):
             db.session.add(course)
             db.session.commit()
         else:
-            # Clear foreign key references before updating
-            db.session.query(CourseProgress).filter_by(course_id=course.id).update({"last_lesson_id": None})
-            for les in list(course.lessons):
-                db.session.delete(les)
-            for mod in list(course.modules):
-                db.session.delete(mod)
-            for fa in list(course.final_assessments):
-                db.session.delete(fa)
+            # Delete child tables using raw SQL to avoid ORM autoflush pooler locks
+            db.session.execute(db.text("UPDATE course_progress SET last_lesson_id = NULL WHERE course_id = :cid;"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM lesson_sources WHERE lesson_id IN (SELECT id FROM lessons WHERE course_id = :cid);"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM quiz_options WHERE question_id IN (SELECT id FROM quiz_questions WHERE quiz_id IN (SELECT id FROM quizzes WHERE lesson_id IN (SELECT id FROM lessons WHERE course_id = :cid)));"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM quiz_questions WHERE quiz_id IN (SELECT id FROM quizzes WHERE lesson_id IN (SELECT id FROM lessons WHERE course_id = :cid));"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM quizzes WHERE lesson_id IN (SELECT id FROM lessons WHERE course_id = :cid);"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM final_assessment_options WHERE question_id IN (SELECT id FROM final_assessment_questions WHERE assessment_id IN (SELECT id FROM final_assessments WHERE course_id = :cid));"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM final_assessment_questions WHERE assessment_id IN (SELECT id FROM final_assessments WHERE course_id = :cid);"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM final_assessments WHERE course_id = :cid;"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM lessons WHERE course_id = :cid;"), {"cid": course.id})
+            db.session.execute(db.text("DELETE FROM course_modules WHERE course_id = :cid;"), {"cid": course.id})
             db.session.commit()
 
         # ==============================================================================
