@@ -50,13 +50,12 @@ def inject_global_data():
         categories = []
     return dict(all_categories=categories)
 
-# Automatically create tables & seed database on app startup if running locally
+# Automatically create tables on app startup if running locally
 if not os.environ.get('VERCEL'):
     with app.app_context():
         try:
             db.create_all()
             seed_database(app)
-            seed_courses()
         except Exception as e:
             print(f"Startup DB init notice: {e}")
 
@@ -114,6 +113,10 @@ def apologetics():
         
     articles = query.order_by(Article.created_at.desc()).all()
     return render_template('apologetics.html', articles=articles, selected_category=selected_category, search_q=search_q)
+
+@app.route('/search')
+def global_search():
+    return redirect(url_for('apologetics', q=request.args.get('q', '')))
 
 @app.route('/category/<slug>')
 def category_detail(slug):
@@ -477,7 +480,7 @@ def login():
         return redirect(url_for('index'))
         
     if request.method == 'POST':
-        email_or_user = request.form.get('email_or_user')
+        email_or_user = request.form.get('email_or_user') or request.form.get('email')
         password = request.form.get('password')
         remember = True if request.form.get('remember') else False
 
@@ -493,7 +496,7 @@ def login():
         else:
             flash("Invalid credentials. Please verify your username/email and password.", "danger")
 
-    return render_template('admin/login.html')
+    return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -507,17 +510,17 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
 
-        if password != confirm_password:
+        if password and confirm_password and password != confirm_password:
             flash("Passwords do not match.", "danger")
-            return render_template('admin/register.html')
+            return render_template('register.html')
 
         if User.query.filter_by(username=username).first():
             flash("Username already exists. Please choose a different one.", "danger")
-            return render_template('admin/register.html')
+            return render_template('register.html')
 
         if User.query.filter_by(email=email).first():
             flash("Email already registered. Please sign in instead.", "danger")
-            return render_template('admin/register.html')
+            return render_template('register.html')
 
         new_user = User(username=username, email=email)
         new_user.set_password(password)
@@ -528,7 +531,7 @@ def register():
         flash("Registration successful! Welcome to ARISE.", "success")
         return redirect(url_for('index'))
 
-    return render_template('admin/register.html')
+    return render_template('register.html')
 
 
 @app.route('/logout')
