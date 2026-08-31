@@ -246,16 +246,41 @@ document.addEventListener('DOMContentLoaded', function() {
   let isPlaying = false;
   let isPaused = false;
   let voices = [];
+  let bestVoice = null;
 
-  // Populate Voice Options
+  // Populate & Prioritize Ultra-Realistic Natural/Neural AI Voices
   function populateVoices() {
-    voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
-    voiceSelect.innerHTML = '<option value="">Default Natural Voice</option>';
+    const rawVoices = synth.getVoices();
+    voices = rawVoices.filter(v => v.lang.startsWith('en'));
+
+    // Score voices for realistic quality: "Natural", "Neural", "Online", "Google", "Enhanced", "Microsoft"
+    voices.sort((a, b) => {
+      const getScore = (voice) => {
+        let score = 0;
+        const name = voice.name.toLowerCase();
+        if (name.includes('natural')) score += 100;
+        if (name.includes('neural')) score += 90;
+        if (name.includes('online')) score += 50;
+        if (name.includes('google')) score += 40;
+        if (name.includes('enhanced')) score += 30;
+        if (name.includes('andrew') || name.includes('guy') || name.includes('aria') || name.includes('ava') || name.includes('brian')) score += 20;
+        if (voice.lang === 'en-US' || voice.lang === 'en-GB') score += 10;
+        return score;
+      };
+      return getScore(b) - getScore(a);
+    });
+
+    voiceSelect.innerHTML = '';
+    
     voices.forEach((voice, index) => {
       const option = document.createElement('option');
       option.value = index;
-      option.textContent = `${voice.name} (${voice.lang})`;
-      if (voice.default) option.selected = true;
+      const isNatural = voice.name.toLowerCase().includes('natural') || voice.name.toLowerCase().includes('neural');
+      option.textContent = `${voice.name} ${isNatural ? '✨ (Natural AI)' : ''}`;
+      if (index === 0) {
+        option.selected = true;
+        bestVoice = voice;
+      }
       voiceSelect.appendChild(option);
     });
   }
@@ -308,18 +333,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const textToRead = currentEl.textContent.trim();
     currentSnippet.textContent = textToRead.length > 70 ? textToRead.substring(0, 70) + '...' : textToRead;
 
+    // Utterance setup with realistic acoustic pitch & rate tuning
     const utterance = new SpeechSynthesisUtterance(textToRead);
-    utterance.rate = parseFloat(speedSelect.value) || 1.0;
+    utterance.rate = parseFloat(speedSelect.value) || 0.95; // Slightly natural pace
+    utterance.pitch = 0.98; // Warm human resonance
 
     const selectedVoiceIndex = voiceSelect.value;
     if (selectedVoiceIndex !== '' && voices[selectedVoiceIndex]) {
       utterance.voice = voices[selectedVoiceIndex];
+    } else if (bestVoice) {
+      utterance.voice = bestVoice;
     }
 
     utterance.onend = function() {
       if (isPlaying && !isPaused) {
-        currentIndex++;
-        readBlock(currentIndex);
+        // Natural 200ms pause between paragraphs
+        setTimeout(() => {
+          if (isPlaying && !isPaused) {
+            currentIndex++;
+            readBlock(currentIndex);
+          }
+        }, 200);
       }
     };
 
