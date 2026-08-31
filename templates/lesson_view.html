@@ -248,23 +248,32 @@ document.addEventListener('DOMContentLoaded', function() {
   let voices = [];
   let bestVoice = null;
 
-  // Populate & Prioritize Ultra-Realistic Natural/Neural AI Voices
+  // Populate & Target Google UK English Male Voice
   function populateVoices() {
     const rawVoices = synth.getVoices();
     voices = rawVoices.filter(v => v.lang.startsWith('en'));
 
-    // Score voices for realistic quality: "Natural", "Neural", "Online", "Google", "Enhanced", "Microsoft"
+    // Strictly prioritize Google UK English Male and UK Male voices
     voices.sort((a, b) => {
       const getScore = (voice) => {
         let score = 0;
         const name = voice.name.toLowerCase();
-        if (name.includes('natural')) score += 100;
-        if (name.includes('neural')) score += 90;
-        if (name.includes('online')) score += 50;
-        if (name.includes('google')) score += 40;
-        if (name.includes('enhanced')) score += 30;
-        if (name.includes('andrew') || name.includes('guy') || name.includes('aria') || name.includes('ava') || name.includes('brian')) score += 20;
-        if (voice.lang === 'en-US' || voice.lang === 'en-GB') score += 10;
+        const lang = voice.lang.toLowerCase();
+
+        // Exact target: Google UK English Male
+        if (name.includes('google') && (name.includes('uk') || lang.includes('gb')) && name.includes('male')) score += 1000;
+        if (name.includes('google uk english male')) score += 2000;
+        
+        // High priority: UK English Male voices
+        if ((lang.includes('gb') || name.includes('uk') || name.includes('united kingdom')) && (name.includes('male') || name.includes('ryan') || name.includes('george') || name.includes('daniel') || name.includes('oliver') || name.includes('arthur'))) score += 500;
+        
+        // General UK voices
+        if (lang.includes('gb') || name.includes('uk')) score += 200;
+        
+        // General Male natural voices
+        if (name.includes('male') || name.includes('guy') || name.includes('andrew') || name.includes('brian')) score += 100;
+        if (name.includes('natural') || name.includes('neural')) score += 50;
+
         return score;
       };
       return getScore(b) - getScore(a);
@@ -272,14 +281,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     voiceSelect.innerHTML = '';
     
+    let defaultSelected = false;
     voices.forEach((voice, index) => {
       const option = document.createElement('option');
       option.value = index;
-      const isNatural = voice.name.toLowerCase().includes('natural') || voice.name.toLowerCase().includes('neural');
-      option.textContent = `${voice.name} ${isNatural ? '✨ (Natural AI)' : ''}`;
+      const isGoogleUKMale = voice.name.toLowerCase().includes('google') && voice.name.toLowerCase().includes('uk') && voice.name.toLowerCase().includes('male');
+      
+      option.textContent = `${voice.name} ${isGoogleUKMale ? '🇬🇧 (Google UK English Male)' : ''}`;
+      
       if (index === 0) {
         option.selected = true;
         bestVoice = voice;
+        defaultSelected = true;
       }
       voiceSelect.appendChild(option);
     });
