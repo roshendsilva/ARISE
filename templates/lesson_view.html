@@ -16,7 +16,7 @@
   <!-- Lesson Reader Header -->
   <div class="row justify-content-center mb-4">
     <div class="col-lg-10">
-      <div class="bg-dark text-white p-4 p-lg-5 rounded-4 border border-secondary shadow-lg">
+      <div class="bg-dark text-white p-4 p-lg-5 rounded-4 border border-secondary shadow-lg mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <span class="badge bg-gold text-dark fw-bold px-3 py-1 text-uppercase">Lesson {{ lesson.lesson_number }} of {{ all_lessons|length }}</span>
           <span class="text-muted small"><i class="bi bi-clock-fill text-gold me-1"></i> {{ lesson.estimated_reading_time }}</span>
@@ -33,6 +33,47 @@
         </div>
         {% endif %}
       </div>
+
+      <!-- Interactive Audio Masterclass Player -->
+      <div class="bg-dark text-white p-3 p-md-4 rounded-4 border border-warning shadow-lg mb-4">
+        <div class="row align-items-center g-3">
+          <div class="col-md-5">
+            <div class="d-flex align-items-center gap-2">
+              <button id="tts-play-btn" class="btn btn-gold px-4 py-2 fw-bold text-navy shadow-sm d-flex align-items-center gap-2">
+                <i class="bi bi-play-circle-fill fs-5" id="tts-icon"></i>
+                <span id="tts-btn-text">Listen to Lesson</span>
+              </button>
+              <button id="tts-stop-btn" class="btn btn-outline-danger px-3 py-2 fw-semibold d-none" title="Stop Reading">
+                <i class="bi bi-stop-circle-fill me-1"></i> Stop
+              </button>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <div class="d-flex flex-wrap align-items-center justify-content-md-end gap-3 small">
+              <div class="d-flex align-items-center gap-2">
+                <label class="text-gold fw-semibold mb-0" for="tts-speed"><i class="bi bi-speedometer2 me-1"></i> Speed:</label>
+                <select id="tts-speed" class="form-select form-select-sm bg-dark text-white border-secondary" style="width: auto;">
+                  <option value="0.75">0.75x</option>
+                  <option value="1.0" selected>1.0x (Normal)</option>
+                  <option value="1.15">1.15x</option>
+                  <option value="1.25">1.25x</option>
+                  <option value="1.5">1.5x</option>
+                </select>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <label class="text-gold fw-semibold mb-0" for="tts-voice"><i class="bi bi-mic me-1"></i> Voice:</label>
+                <select id="tts-voice" class="form-select form-select-sm bg-dark text-white border-secondary" style="max-width: 180px;">
+                  <option value="">Default Voice</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="tts-status-box" class="small text-gold mt-3 pt-2 border-top border-secondary fw-semibold d-none d-flex align-items-center gap-2">
+          <span class="spinner-grow spinner-grow-sm text-gold" role="status"></span>
+          <span>Reading Aloud: <span id="tts-current-snippet" class="text-white fw-normal fst-italic">...</span></span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -42,7 +83,7 @@
       <article class="bg-dark text-white p-4 p-md-5 rounded-4 border border-secondary shadow-lg lesson-article-prose" style="font-size: 1.15rem; line-height: 1.85; font-family: 'Georgia', 'Times New Roman', serif;">
         
         <!-- Main Article Rendered -->
-        <div class="article-body">
+        <div class="article-body" id="lesson-article-body">
           {{ lesson.content | render_md | safe }}
         </div>
 
@@ -168,4 +209,171 @@
     </div>
   </div>
 </div>
+
+<style>
+  .tts-highlight-active {
+    background-color: rgba(212, 175, 55, 0.18) !important;
+    border-left: 4px solid var(--gold-bright, #d4af37) !important;
+    padding-left: 1rem !important;
+    border-radius: 6px !important;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.25);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (!('speechSynthesis' in window)) {
+    console.log('Web Speech API is not supported in this browser.');
+    const playBtn = document.getElementById('tts-play-btn');
+    if (playBtn) playBtn.disabled = true;
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+  const playBtn = document.getElementById('tts-play-btn');
+  const stopBtn = document.getElementById('tts-stop-btn');
+  const icon = document.getElementById('tts-icon');
+  const btnText = document.getElementById('tts-btn-text');
+  const speedSelect = document.getElementById('tts-speed');
+  const voiceSelect = document.getElementById('tts-voice');
+  const statusBox = document.getElementById('tts-status-box');
+  const currentSnippet = document.getElementById('tts-current-snippet');
+  const articleBody = document.getElementById('lesson-article-body');
+
+  let elementsToRead = [];
+  let currentIndex = 0;
+  let isPlaying = false;
+  let isPaused = false;
+  let voices = [];
+
+  // Populate Voice Options
+  function populateVoices() {
+    voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+    voiceSelect.innerHTML = '<option value="">Default Natural Voice</option>';
+    voices.forEach((voice, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = `${voice.name} (${voice.lang})`;
+      if (voice.default) option.selected = true;
+      voiceSelect.appendChild(option);
+    });
+  }
+
+  populateVoices();
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoices;
+  }
+
+  // Gather all readable blocks (paragraphs, headings, lists)
+  if (articleBody) {
+    const rawElements = articleBody.querySelectorAll('h1, h2, h3, h4, p, li');
+    rawElements.forEach(el => {
+      if (el.textContent.trim().length > 0) {
+        elementsToRead.push(el);
+      }
+    });
+  }
+
+  function clearHighlights() {
+    elementsToRead.forEach(el => el.classList.remove('tts-highlight-active'));
+  }
+
+  function stopAudio() {
+    synth.cancel();
+    isPlaying = false;
+    isPaused = false;
+    clearHighlights();
+    currentIndex = 0;
+    icon.className = 'bi bi-play-circle-fill fs-5';
+    btnText.textContent = 'Listen to Lesson';
+    playBtn.className = 'btn btn-gold px-4 py-2 fw-bold text-navy shadow-sm d-flex align-items-center gap-2';
+    stopBtn.classList.add('d-none');
+    statusBox.classList.add('d-none');
+  }
+
+  function readBlock(index) {
+    if (index >= elementsToRead.length || !isPlaying) {
+      stopAudio();
+      return;
+    }
+
+    const currentEl = elementsToRead[index];
+    clearHighlights();
+    currentEl.classList.add('tts-highlight-active');
+    
+    // Smooth scroll active reading paragraph into view
+    currentEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    const textToRead = currentEl.textContent.trim();
+    currentSnippet.textContent = textToRead.length > 70 ? textToRead.substring(0, 70) + '...' : textToRead;
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.rate = parseFloat(speedSelect.value) || 1.0;
+
+    const selectedVoiceIndex = voiceSelect.value;
+    if (selectedVoiceIndex !== '' && voices[selectedVoiceIndex]) {
+      utterance.voice = voices[selectedVoiceIndex];
+    }
+
+    utterance.onend = function() {
+      if (isPlaying && !isPaused) {
+        currentIndex++;
+        readBlock(currentIndex);
+      }
+    };
+
+    utterance.onerror = function(err) {
+      console.error('TTS Error:', err);
+      currentIndex++;
+      readBlock(currentIndex);
+    };
+
+    synth.speak(utterance);
+  }
+
+  playBtn.addEventListener('click', function() {
+    if (!isPlaying) {
+      isPlaying = true;
+      isPaused = false;
+      icon.className = 'bi bi-pause-circle-fill fs-5';
+      btnText.textContent = 'Pause Audio';
+      playBtn.className = 'btn btn-warning px-4 py-2 fw-bold text-dark shadow-sm d-flex align-items-center gap-2';
+      stopBtn.classList.remove('d-none');
+      statusBox.classList.remove('d-none');
+      readBlock(currentIndex);
+    } else if (isPaused) {
+      synth.resume();
+      isPaused = false;
+      icon.className = 'bi bi-pause-circle-fill fs-5';
+      btnText.textContent = 'Pause Audio';
+      playBtn.className = 'btn btn-warning px-4 py-2 fw-bold text-dark shadow-sm d-flex align-items-center gap-2';
+    } else {
+      synth.pause();
+      isPaused = true;
+      icon.className = 'bi bi-play-circle-fill fs-5';
+      btnText.textContent = 'Resume Audio';
+      playBtn.className = 'btn btn-gold px-4 py-2 fw-bold text-navy shadow-sm d-flex align-items-center gap-2';
+    }
+  });
+
+  stopBtn.addEventListener('click', function() {
+    stopAudio();
+  });
+
+  speedSelect.addEventListener('change', function() {
+    if (isPlaying && !isPaused) {
+      synth.cancel();
+      readBlock(currentIndex);
+    }
+  });
+
+  voiceSelect.addEventListener('change', function() {
+    if (isPlaying && !isPaused) {
+      synth.cancel();
+      readBlock(currentIndex);
+    }
+  });
+});
+</script>
 {% endblock %}
