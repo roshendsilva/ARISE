@@ -677,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function() {
     return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
   }
 
-  // Draw Scene Infographic Pictures & 60fps Dynamic Motion Animation Overlays
+  // Draw 60fps High-Definition Animated Vector Motion Video Graphics
   let tick = 0;
   function renderCanvas() {
     tick++;
@@ -688,48 +688,148 @@ document.addEventListener('DOMContentLoaded', function() {
     const currentSceneIndex = Math.min(Math.floor(currentVideoTime / 60), 9);
     const s = scenes[currentSceneIndex];
 
+    // 1. Draw Base Infographic Picture Image with Motion Camera Pan & Zoom
     if (s.img && s.img.complete && s.img.naturalWidth > 0) {
-      // 1. Render Picture Infographic Image with Smooth Ken Burns Zoom Motion
-      const scale = 1.0 + (Math.sin(tick * 0.008) * 0.03);
+      const zoom = 1.05 + (Math.sin(tick * 0.01) * 0.04);
+      const panX = Math.cos(tick * 0.008) * 15;
+      const panY = Math.sin(tick * 0.008) * 10;
+      
       ctx.save();
-      ctx.translate(w/2, h/2);
-      ctx.scale(scale, scale);
+      ctx.translate(w/2 + panX, h/2 + panY);
+      ctx.scale(zoom, zoom);
       ctx.drawImage(s.img, -w/2, -h/2, w, h);
       ctx.restore();
-
-      // 2. LAYER 60fps ANIMATION VIDEO OVERLAYS (Golden Particle Light Streams & Pulsing Rays)
-      for (let i = 0; i < 20; i++) {
-        const px = (w * 0.1) + ((i * 47 + tick * 1.5) % (w * 0.8));
-        const py = (h * 0.2) + Math.sin(i + tick * 0.04) * (h * 0.3);
-        const radius = 2 + Math.sin(tick * 0.05 + i) * 2;
-        
-        ctx.fillStyle = i % 2 === 0 ? 'rgba(212, 175, 55, 0.6)' : 'rgba(56, 189, 248, 0.6)';
-        ctx.shadowColor = '#fbbf24';
-        ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.arc(px, py, Math.max(1, radius), 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // 3. Pulsing Golden Border Frame
-      ctx.strokeStyle = `rgba(212, 175, 55, ${0.4 + Math.sin(tick * 0.05) * 0.2})`;
-      ctx.lineWidth = 6;
-      ctx.strokeRect(0, 0, w, h);
-
     } else {
-      // Fallback Motion Graphics
       const bgGrad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w);
       bgGrad.addColorStop(0, '#1e293b');
       bgGrad.addColorStop(1, '#090d16');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
+    }
+
+    // 2. DRAW REAL-TIME 60fps ANIMATED VECTOR MOTION GRAPHICS VIDEO OVERLAYS
+    if (currentSceneIndex === 0 || currentSceneIndex === 4 || currentSceneIndex === 8) {
+      // SCENE ANIMATION: Rotating Gold Sunburst Rays & Floating Chi-Rho Cross Wave
+      ctx.save();
+      ctx.translate(w * 0.5, h * 0.35);
+      ctx.rotate(tick * 0.005);
+      for (let i = 0; i < 12; i++) {
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, w * 0.6, (i * Math.PI / 6), ((i + 0.5) * Math.PI / 6));
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Pulsing Chi-Rho Cross Graphic
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 25 + Math.sin(tick * 0.05) * 10;
+      ctx.fillRect(w * 0.5 - 4, h * 0.15, 8, 45);
+      ctx.fillRect(w * 0.5 - 20, h * 0.22, 40, 8);
+      ctx.shadowBlur = 0;
+
+    } else if (currentSceneIndex === 1 || currentSceneIndex === 6) {
+      // SCENE ANIMATION: Mystical Body Animated Nerve-Light Stream & Pulsing Believer Nodes
+      const headX = w * 0.5;
+      const headY = h * 0.22;
+
+      // Animated Pulsing Heart of Christ
+      ctx.fillStyle = '#ef4444';
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 30 + Math.sin(tick * 0.08) * 15;
+      ctx.beginPath();
+      ctx.arc(headX, headY, 18 + Math.sin(tick * 0.08) * 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Animated Electric Light Rivers Flowing Down
+      const believerNodes = [
+        {x: w*0.20, y: h*0.60}, {x: w*0.35, y: h*0.75}, {x: w*0.50, y: h*0.80},
+        {x: w*0.65, y: h*0.75}, {x: w*0.80, y: h*0.60}
+      ];
+
+      believerNodes.forEach((node, idx) => {
+        ctx.strokeStyle = `rgba(56, 189, 248, ${0.5 + Math.sin(tick*0.06 + idx)*0.4})`;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(headX, headY);
+        ctx.bezierCurveTo(headX, (headY + node.y)/2, node.x, (headY + node.y)/2, node.x, node.y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, 10 + Math.sin(tick*0.08 + idx)*3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+
+    } else if (currentSceneIndex === 2 || currentSceneIndex === 5) {
+      // SCENE ANIMATION: Rotating 3D Hierarchy Gear Ring & Falling Sanctifying Grace Waves
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // Rotating Outer Gear
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tick * 0.015);
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(-80, -80, 160, 160);
+      ctx.restore();
+
+      // Falling Grace Rivers
+      for (let i = 0; i < 30; i++) {
+        const gy = ((tick * 3 + i * 25) % h);
+        const gx = (w * 0.2) + (i * 27) % (w * 0.6);
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.7)';
+        ctx.fillRect(gx, gy, 3, 15);
+      }
+
+    } else {
+      // SCENE ANIMATION: 7 Orbiting Sacramental Orbs around Monstrance Globe
+      const cx = w * 0.5;
+      const cy = h * 0.5;
 
       ctx.fillStyle = '#fbbf24';
-      ctx.font = 'bold 24px "Cinzel", serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(s.title, w/2, h/2);
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 35;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 32 + Math.sin(tick * 0.05) * 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // 7 Orbiting Orbs
+      for (let i = 0; i < 7; i++) {
+        const angle = (i * (Math.PI * 2 / 7)) + (tick * 0.025);
+        const ox = cx + Math.cos(angle) * (w * 0.3);
+        const oy = cy + Math.sin(angle) * (h * 0.25);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(ox, oy, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
     }
+
+    // 3. Floating Sparkle Particles Overlay
+    for (let i = 0; i < 25; i++) {
+      const px = (i * 37 + tick * 2) % w;
+      const py = (h * 0.1) + Math.sin(i + tick * 0.03) * (h * 0.8);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.fillRect(px, py, 2, 2);
+    }
+
+    // 4. Pulsing Gold Frame Overlay
+    ctx.strokeStyle = `rgba(212, 175, 55, ${0.5 + Math.sin(tick * 0.05) * 0.3})`;
+    ctx.lineWidth = 6;
+    ctx.strokeRect(0, 0, w, h);
 
     if (isVideoPlaying) {
       animFrameId = requestAnimationFrame(renderCanvas);
@@ -761,7 +861,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Speak Narration for Current Scene
+  // Seamless Gapless Audio Speech Engine
+  let activeUtterance = null;
+
   function playSceneNarration() {
     if (!('speechSynthesis' in window)) return;
     const synth = window.speechSynthesis;
@@ -770,17 +872,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const sceneIdx = Math.min(Math.floor(currentVideoTime / 60), 9);
     const s = scenes[sceneIdx];
 
-    const utterance = new SpeechSynthesisUtterance(s.narration);
-    utterance.rate = 0.95;
-    utterance.pitch = 0.98;
+    activeUtterance = new SpeechSynthesisUtterance(s.narration);
+    activeUtterance.rate = 0.98;
+    activeUtterance.pitch = 0.98;
 
     const voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
     const ukMaleVoice = voices.find(v => 
       v.name.toLowerCase().includes('google') && v.name.toLowerCase().includes('uk') && v.name.toLowerCase().includes('male')
     ) || voices.find(v => v.lang.toLowerCase().includes('gb') && v.name.toLowerCase().includes('male')) || voices[0];
 
-    if (ukMaleVoice) utterance.voice = ukMaleVoice;
-    synth.speak(utterance);
+    if (ukMaleVoice) activeUtterance.voice = ukMaleVoice;
+
+    // Seamless chaining when utterance completes naturally
+    activeUtterance.onend = function() {
+      if (isVideoPlaying) {
+        const nextSceneTime = (Math.floor(currentVideoTime / 60) + 1) * 60;
+        if (nextSceneTime < 600) {
+          currentVideoTime = nextSceneTime;
+          updateUI();
+          playSceneNarration();
+        }
+      }
+    };
+
+    synth.speak(activeUtterance);
   }
 
   // Play / Pause Video Motion
@@ -795,11 +910,6 @@ document.addEventListener('DOMContentLoaded', function() {
       if (currentVideoTime < 600) {
         currentVideoTime++;
         updateUI();
-
-        // Speak next scene narration on boundary
-        if (currentVideoTime % 60 === 0) {
-          playSceneNarration();
-        }
       } else {
         pauseVideo();
         currentVideoTime = 0;
