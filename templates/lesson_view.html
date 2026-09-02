@@ -74,6 +74,64 @@
           <span>Reading Aloud: <span id="tts-current-snippet" class="text-white fw-normal fst-italic">...</span></span>
         </div>
       </div>
+
+      <!-- 5-MINUTE ANIMATED VIDEO MASTERCLASS PLAYER (LESSON 1 EXCLUSIVE) -->
+      {% if lesson.lesson_number == 1 %}
+      <div class="bg-dark text-white p-4 rounded-4 border border-warning shadow-lg mb-5 overflow-hidden position-relative">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-danger text-white fw-bold px-3 py-1 text-uppercase"><i class="bi bi-camera-reels-fill me-1"></i> 5-Min Video Masterclass</span>
+            <span class="badge bg-gold text-dark fw-bold px-2 py-1">Animated Motion Lesson</span>
+          </div>
+          <span class="text-gold small fw-bold" id="video-time-display"><i class="bi bi-clock-history me-1"></i> 00:00 / 05:00</span>
+        </div>
+
+        <!-- Cinematic Video Motion Canvas (16:9 Aspect Ratio) -->
+        <div class="position-relative bg-black rounded-3 overflow-hidden border border-secondary shadow" style="aspect-ratio: 16/9; min-height: 280px;">
+          <canvas id="video-canvas" class="w-100 h-100 d-block"></canvas>
+          
+          <!-- Overlay Scene Title & Text Banner -->
+          <div class="position-absolute bottom-0 start-0 end-0 p-3 p-md-4 bg-gradient-dark text-white" style="background: linear-gradient(transparent, rgba(9, 13, 22, 0.95));">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="badge bg-warning text-dark fw-bold" id="scene-badge">SCENE 1 of 5</span>
+              <h4 class="h6 fw-bold text-gold mb-0 brand-font" id="scene-title">The Covenantal Assembly (Ekklesia)</h4>
+            </div>
+            <p class="small text-slate-200 mb-0 fst-italic" id="scene-description" style="line-height: 1.4;">
+              From Mount Sinai's Old Covenant to Christ's New Covenant Assembly upon Saint Peter (Matthew 16:18).
+            </p>
+          </div>
+
+          <!-- Video Play Overlay Center Button -->
+          <button id="video-overlay-play" class="btn btn-gold btn-lg rounded-circle position-absolute top-50 start-50 translate-middle shadow-lg p-3" style="width: 70px; height: 70px;">
+            <i class="bi bi-play-fill fs-1 text-navy" style="margin-left: 4px;"></i>
+          </button>
+        </div>
+
+        <!-- Video Progress Bar -->
+        <div class="mt-3">
+          <input type="range" class="form-range custom-video-range" id="video-seekbar" min="0" max="300" value="0" step="1">
+        </div>
+
+        <!-- Interactive Chapter Buttons (1-Minute Scenes) -->
+        <div class="d-flex flex-wrap gap-2 mt-3 pt-2 border-top border-secondary">
+          <button class="btn btn-sm btn-outline-gold active-chapter-btn chapter-btn" data-time="0">
+            <i class="bi bi-bookmark-fill me-1"></i> 0:00 Scene 1: Ekklesia
+          </button>
+          <button class="btn btn-sm btn-outline-gold chapter-btn" data-time="60">
+            <i class="bi bi-bookmark-fill me-1"></i> 1:00 Scene 2: Mystical Body
+          </button>
+          <button class="btn btn-sm btn-outline-gold chapter-btn" data-time="120">
+            <i class="bi bi-bookmark-fill me-1"></i> 2:00 Scene 3: Dual Reality
+          </button>
+          <button class="btn btn-sm btn-outline-gold chapter-btn" data-time="180">
+            <i class="bi bi-bookmark-fill me-1"></i> 3:00 Scene 4: Sacraments
+          </button>
+          <button class="btn btn-sm btn-outline-gold chapter-btn" data-time="240">
+            <i class="bi bi-bookmark-fill me-1"></i> 4:00 Scene 5: Bride of Christ
+          </button>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 
@@ -423,4 +481,361 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 </script>
+
+{% if lesson.lesson_number == 1 %}
+<script>
+// ============================================================================
+// 5-MINUTE ANIMATED VIDEO MASTERCLASS ENGINE (LESSON 1 EXCLUSIVE)
+// ============================================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('video-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const overlayPlayBtn = document.getElementById('video-overlay-play');
+  const seekbar = document.getElementById('video-seekbar');
+  const timeDisplay = document.getElementById('video-time-display');
+  const sceneBadge = document.getElementById('scene-badge');
+  const sceneTitle = document.getElementById('scene-title');
+  const sceneDesc = document.getElementById('scene-description');
+  const chapterBtns = document.querySelectorAll('.chapter-btn');
+
+  let currentVideoTime = 0; // 0 to 300 seconds (5 mins)
+  let isVideoPlaying = false;
+  let videoTimer = null;
+  let animFrameId = null;
+
+  // Resize canvas dynamically
+  function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth || 800;
+    canvas.height = canvas.parentElement.clientHeight || 450;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // 5 Minute Scenes Data (60s each)
+  const scenes = [
+    {
+      startTime: 0,
+      endTime: 60,
+      badge: "SCENE 1 of 5 (0:00 - 1:00)",
+      title: "The Covenantal Assembly (Ekklesia)",
+      desc: "From Mount Sinai's Old Covenant to Christ's New Covenant Assembly upon Saint Peter (Matthew 16:18).",
+      narration: "Welcome to Lesson 1 of the ARISE Formation Academy: What Is the Catholic Church? To understand the Church, we begin with God's covenantal plan. In the Old Testament, God gathered Israel at Mount Sinai, called in Greek the Ekklesia of the Lord. When Jesus declared in Matthew 16:18, 'On this rock I will build my Ekklesia,' He was establishing the New Covenant Assembly of God."
+    },
+    {
+      startTime: 60,
+      endTime: 120,
+      badge: "SCENE 2 of 5 (1:00 - 2:00)",
+      title: "The Mystical Body of Christ",
+      desc: "Christ the Head, baptized believers as interconnected living limbs, and the Holy Spirit as the animating Soul (1 Cor 12:27).",
+      narration: "The deepest theological definition of the Church is the Mystical Body of Jesus Christ. As Saint Paul writes in First Corinthians Chapter 12, Christ is the divine Head, and all baptized believers are living limbs of His Body. The Holy Spirit indwells the Church as her invisible Soul, animating every member with sanctifying grace and divine love."
+    },
+    {
+      startTime: 120,
+      endTime: 180,
+      badge: "SCENE 3 of 5 (2:00 - 3:00)",
+      title: "Dual Reality: Visible Hierarchy & Invisible Grace",
+      desc: "Sacramental governance and invisible sanctifying grace form one single, undivided reality (Lumen Gentium 8).",
+      narration: "The Catholic Church possesses a dual reality: a visible institutional hierarchy of validly ordained bishops, sacraments, and canon law; and an invisible divine soul of sanctifying grace. As Vatican Council II defined in Lumen Gentium, institution and spirit form one single, undivided reality—just as Christ is true God and true Man."
+    },
+    {
+      startTime: 180,
+      endTime: 240,
+      badge: "SCENE 4 of 5 (3:00 - 4:00)",
+      title: "The Universal Sacrament of Salvation",
+      desc: "Seven radiant sacramental channels dispensing Christ's redemption across all nations and historical ages.",
+      narration: "The Church is the Universal Sacrament of Salvation. Through her Seven Sacraments—instituted by Christ—she makes the invisible redemption of Calvary physically accessible to human souls across every nation and century, accompanying believers from birth in Baptism to death in Anointing of the Sick."
+    },
+    {
+      startTime: 240,
+      endTime: 300,
+      badge: "SCENE 5 of 5 (4:00 - 5:00)",
+      title: "The Immaculate Bride of Christ & Conclusion",
+      desc: "Spousal fidelity between Christ and His unblemished Bride, Mother of the Faithful (Ephesians 5:25-27).",
+      narration: "Finally, Sacred Scripture depicts the Church as the immaculate Bride of Christ. As Saint Paul writes in Ephesians Chapter 5, Christ gave Himself up for her, that He might present her in splendor, without spot or wrinkle. The Church remains today what she has been for two thousand years: Mother of the Faithful and the ark of eternal salvation."
+    }
+  ];
+
+  // Helper format time mm:ss
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  }
+
+  // Draw Scene Animation Graphics on 60fps Canvas
+  let tick = 0;
+  function renderCanvas() {
+    tick++;
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    // Dark Background Gradient
+    const bgGrad = ctx.createRadialGradient(w/2, h/2, 50, w/2, h/2, w);
+    bgGrad.addColorStop(0, '#1e293b');
+    bgGrad.addColorStop(1, '#090d16');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    const currentSceneIndex = Math.min(Math.floor(currentVideoTime / 60), 4);
+    const sceneTime = currentVideoTime % 60;
+
+    if (currentSceneIndex === 0) {
+      // SCENE 1: Sinai Peak -> Cathedral Dome & Chi-Rho
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 3;
+
+      // Mountain / Cathedral Lines
+      ctx.beginPath();
+      ctx.moveTo(w * 0.2, h * 0.85);
+      ctx.lineTo(w * 0.5, h * 0.25 + Math.sin(tick * 0.05) * 4);
+      ctx.lineTo(w * 0.8, h * 0.85);
+      ctx.stroke();
+
+      // Glowing Cross atop Peak
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 20;
+      ctx.fillRect(w * 0.5 - 4, h * 0.15, 8, 35);
+      ctx.fillRect(w * 0.5 - 15, h * 0.20, 30, 8);
+      ctx.shadowBlur = 0;
+
+      // Light particles streaming in
+      for (let i = 0; i < 25; i++) {
+        const px = w * 0.5 + Math.cos(i + tick * 0.03) * (100 + i * 5);
+        const py = h * 0.5 + Math.sin(i + tick * 0.03) * (50 + i * 3);
+        ctx.fillStyle = i % 2 === 0 ? '#d4af37' : '#ffffff';
+        ctx.beginPath();
+        ctx.arc(px, py, 3 + (i % 3), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+    } else if (currentSceneIndex === 1) {
+      // SCENE 2: Mystical Body Node Network
+      const centerX = w * 0.5;
+      const headY = h * 0.25;
+
+      // Head Node (Christ)
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 25;
+      ctx.beginPath();
+      ctx.arc(centerX, headY, 24, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Connecting Light Streams to Believer Nodes
+      const nodes = [
+        {x: w*0.25, y: h*0.65}, {x: w*0.38, y: h*0.55},
+        {x: w*0.50, y: h*0.75}, {x: w*0.62, y: h*0.55}, {x: w*0.75, y: h*0.65}
+      ];
+
+      nodes.forEach((n, i) => {
+        ctx.strokeStyle = `rgba(56, 189, 248, ${0.4 + Math.sin(tick*0.08 + i)*0.3})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(centerX, headY);
+        ctx.lineTo(n.x, n.y);
+        ctx.stroke();
+
+        // Believer Node
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+    } else if (currentSceneIndex === 2) {
+      // SCENE 3: Dual Reality (Visible Hierarchy & Invisible Grace)
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // Outer Rotating Hierarchy Gear Ring (Gold)
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(tick * 0.01);
+      ctx.strokeStyle = '#d4af37';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(-70, -70, 140, 140);
+      ctx.restore();
+
+      // Inner Pulsing Grace Circle (Cyan)
+      ctx.strokeStyle = '#38bdf8';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 50 + Math.sin(tick * 0.05) * 10, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+    } else if (currentSceneIndex === 3) {
+      // SCENE 4: 7 Sacraments Orb Radiating Globe
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // Central Sacramental Orb
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 30;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // 7 Orbiting Sacramental Gems
+      for (let i = 0; i < 7; i++) {
+        const angle = (i * (Math.PI * 2 / 7)) + (tick * 0.02);
+        const gx = cx + Math.cos(angle) * 110;
+        const gy = cy + Math.sin(angle) * 70;
+        
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(gx, gy, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(gx, gy);
+        ctx.stroke();
+      }
+
+    } else if (currentSceneIndex === 4) {
+      // SCENE 5: Bride of Christ White & Gold Veil
+      const cx = w * 0.5;
+      const cy = h * 0.5;
+
+      // Swirling Shimmering Gold & White Veil
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.7 + Math.sin(tick*0.05)*0.2})`;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 140 + Math.sin(tick*0.04)*15, 80 + Math.cos(tick*0.04)*10, tick*0.01, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#d4af37';
+      ctx.font = 'bold 22px "Cinzel", serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Bride of Christ & Mother of the Faithful', cx, cy + 8);
+    }
+
+    if (isVideoPlaying) {
+      animFrameId = requestAnimationFrame(renderCanvas);
+    }
+  }
+
+  // Update UI elements for current time
+  function updateUI() {
+    seekbar.value = currentVideoTime;
+    timeDisplay.innerHTML = `<i class="bi bi-clock-history me-1"></i> ${formatTime(currentVideoTime)} / 05:00`;
+
+    const sceneIdx = Math.min(Math.floor(currentVideoTime / 60), 4);
+    const s = scenes[sceneIdx];
+
+    sceneBadge.textContent = s.badge;
+    sceneTitle.textContent = s.title;
+    sceneDesc.textContent = s.desc;
+
+    // Update active chapter button UI
+    chapterBtns.forEach(btn => {
+      const bTime = parseInt(btn.getAttribute('data-time'));
+      if (bTime <= currentVideoTime && currentVideoTime < bTime + 60) {
+        btn.classList.add('bg-gold', 'text-dark', 'fw-bold');
+        btn.classList.remove('btn-outline-gold');
+      } else {
+        btn.classList.remove('bg-gold', 'text-dark', 'fw-bold');
+        btn.classList.add('btn-outline-gold');
+      }
+    });
+  }
+
+  // Speak Narration for Current Scene
+  function playSceneNarration() {
+    if (!('speechSynthesis' in window)) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    const sceneIdx = Math.min(Math.floor(currentVideoTime / 60), 4);
+    const s = scenes[sceneIdx];
+
+    const utterance = new SpeechSynthesisUtterance(s.narration);
+    utterance.rate = 0.95;
+    utterance.pitch = 0.98;
+
+    const voices = synth.getVoices().filter(v => v.lang.startsWith('en'));
+    const ukMaleVoice = voices.find(v => 
+      v.name.toLowerCase().includes('google') && v.name.toLowerCase().includes('uk') && v.name.toLowerCase().includes('male')
+    ) || voices.find(v => v.lang.toLowerCase().includes('gb') && v.name.toLowerCase().includes('male')) || voices[0];
+
+    if (ukMaleVoice) utterance.voice = ukMaleVoice;
+    synth.speak(utterance);
+  }
+
+  // Play / Pause Video Motion
+  function startVideo() {
+    if (isVideoPlaying) return;
+    isVideoPlaying = true;
+    overlayPlayBtn.classList.add('d-none');
+
+    playSceneNarration();
+
+    videoTimer = setInterval(() => {
+      if (currentVideoTime < 300) {
+        currentVideoTime++;
+        updateUI();
+
+        // Speak next scene narration on boundary
+        if (currentVideoTime % 60 === 0) {
+          playSceneNarration();
+        }
+      } else {
+        pauseVideo();
+        currentVideoTime = 0;
+        updateUI();
+      }
+    }, 1000);
+
+    renderCanvas();
+  }
+
+  function pauseVideo() {
+    isVideoPlaying = false;
+    overlayPlayBtn.classList.remove('d-none');
+    clearInterval(videoTimer);
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+
+  overlayPlayBtn.addEventListener('click', function() {
+    startVideo();
+  });
+
+  seekbar.addEventListener('input', function() {
+    currentVideoTime = parseInt(this.value);
+    updateUI();
+    renderCanvas();
+    if (isVideoPlaying) playSceneNarration();
+  });
+
+  chapterBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      currentVideoTime = parseInt(this.getAttribute('data-time'));
+      updateUI();
+      renderCanvas();
+      if (!isVideoPlaying) {
+        startVideo();
+      } else {
+        playSceneNarration();
+      }
+    });
+  });
+
+  // Initial draw
+  updateUI();
+  renderCanvas();
+});
+</script>
+{% endif %}
 {% endblock %}
