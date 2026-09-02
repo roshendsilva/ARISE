@@ -1,0 +1,60 @@
+================================================================================
+CLAUDE ANIMATION GENERATION PROMPT: LESSON 1 — WHAT IS THE CATHOLIC CHURCH?
+================================================================================
+
+PROMPT TITLE:
+Interactive Web Animation for ARISE Lesson 1: "What Is the Catholic Church?"
+
+SYSTEM & CORE GOAL:
+You are an expert Frontend Interactive Engineer, UI/UX Motion Designer, and Catholic Animator. 
+Your task is to build a standalone, fully responsive, interactive HTML5 / CSS3 (Vanilla JS + SVG + HTML5 Canvas) web animation component designed specifically to illustrate Lesson 1 of the ARISE Catholic Apologetics Masterclass: "What Is the Catholic Church?".
+
+The animation must visually explain four core theological dimensions of the Catholic Church:
+1. THE COVENANTAL ASSEMBLY (EKKLESIA): From Mt. Sinai's Old Covenant to Christ's New Covenant Assembly (Matthew 16:18).
+2. THE MYSTICAL BODY OF CHRIST: Christ as the Divine Head, baptized believers as interconnected limbs, and the Holy Spirit as the animating Soul (1 Corinthians 12, Ephesians 1).
+3. DUAL REALITY (VISIBLE & INVISIBLE): The harmonious unity of the Visible Hierarchy (bishops, sacraments, governance) and the Invisible Divine Grace.
+4. THE UNIVERSAL SACRAMENT & BRIDE OF CHRIST: The Church as an efficacious sign of salvation and the immaculate Bride of the Lamb (Lumen Gentium 1, Ephesians 5).
+
+--------------------------------------------------------------------------------
+TECHNICAL REQUIREMENTS FOR THE ANIMATION CODE:
+--------------------------------------------------------------------------------
+- Output Format: A single, self-contained HTML file containing CSS inside `<style>` and JavaScript inside `<script>`.
+- Color Palette: Rich Academic Modern Catholic Dark Mode (#090d16 background, Gold accents #d4af37 / #fbbf24, Deep Navy #0f172a, Crimson highlights #991b1b, Glowing Cyan/White for Grace #38bdf8 / #ffffff).
+- Frameworks: Zero heavy external framework dependencies. Pure Vanilla JavaScript + SVG animations or HTML5 Canvas with smooth 60fps requestAnimationFrame.
+- Interactivity: 
+  * Step-by-step interactive navigation controls (Buttons: "1. Ekklesia Assembly", "2. Mystical Body", "3. Dual Reality", "4. Sacrament & Bride", "Play Full Animation").
+  * Hover cards/tooltips revealing biblical references (Matt 16:18, 1 Cor 12:27, Eph 5:25, Lumen Gentium 1) when clicking on elements.
+  * Responsive canvas/SVG container that scales dynamically on mobile, tablet, and desktop screens.
+
+--------------------------------------------------------------------------------
+SCENE-BY-SCENE VISUAL MOTION SPECIFICATIONS:
+--------------------------------------------------------------------------------
+
+SCENE 1: THE COVENANTAL ASSEMBLY (EKKLESIA)
+- Visual: A glowing gold mountain peak (representing Mt. Sinai, Deut 9:10) with golden light rays radiating outwards.
+- Motion: Rays of light stream down to gather glowing particles (representing the Qahal / Ekklesia assembly of believers).
+- Transition: The mountain smoothly morphs into a majestic Gothic/Romanesque cathedral dome with a glowing Chi-Rho (☧) cross atop it.
+- Text Banner: "Ekklesia — Called out from darkness into the New Covenant Assembly of Jesus Christ (Matthew 16:18)."
+
+SCENE 2: THE MYSTICAL BODY OF CHRIST (1 Cor 12:12-27)
+- Visual: A luminous golden silhouette of Christ at the top (The Head). From Christ's heart, glowing streams of light flow downward connecting floating node points representing believers (hands, feet, eyes, organs).
+- Motion: A pulsing blue/gold aura (representing the indwelling Holy Spirit, the Soul of the Church) flows rhythmically through every node, demonstrating organic unity.
+- Interactive Action: Hovering over any node displays a popup text quote: "Now you are the body of Christ and individually members of it (1 Cor 12:27)."
+
+SCENE 3: DUAL REALITY — VISIBLE HIERARCHY & INVISIBLE GRACE
+- Visual: A split-view overlay or dual-layered structure showing:
+  * Visible Pillar Layer (Left/Bottom): Mitres, Keys of St. Peter, Chalice, Altars, Sacramental Icons.
+  * Invisible Grace Layer (Right/Top): Descending Dove of the Holy Spirit, rivers of sanctifying grace flowing from Calvary into the chalice.
+- Motion: Golden streams of light interlock the two layers together, showing that institution and spirit form ONE single undivided reality (refuting ecclesiological Nestorianism).
+- Text Banner: "Visible Hierarchy & Invisible Divine Grace — One Single Undivided Reality (Lumen Gentium 8)."
+
+SCENE 4: UNIVERSAL SACRAMENT OF SALVATION & BRIDE OF CHRIST
+- Visual: A central glowing monstrance/sacramental orb surrounded by 7 radiant gems (representing the 7 Sacraments). Light beams shoot out to encircle the entire globe.
+- Motion: A pure white and gold veil smoothly wraps around the cathedral and globe, symbolizing the immaculate Bride of Christ (Ephesians 5:25-27) and Mother of the Faithful (St. Cyprian).
+- Text Banner: "The Universal Sacrament of Salvation — Communicating Christ's divine life to all nations."
+
+--------------------------------------------------------------------------------
+DELIVERABLE EXPECTATION:
+--------------------------------------------------------------------------------
+Please generate the complete, production-ready, beautifully styled HTML5/CSS3/JS code for this animation component so that it can be pasted directly into a web app.
+================================================================================
